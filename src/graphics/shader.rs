@@ -1,7 +1,8 @@
 use core::panic;
-use std::collections::HashMap;
-
-use gl::{self, types::GLchar};
+use std::{collections::HashMap, io};
+use gl::{self, types::{GLchar, GLvoid}};
+use glam;
+use image::flat;
 
 use crate::graphics::object::GLObject;
 
@@ -35,6 +36,11 @@ impl Shader {
         Shader {
             handle
         }
+    }
+
+    pub fn from_file(path: &str, shader_type: ShaderType) -> Result<Shader, io::Error> {
+        let source = std::fs::read_to_string(path)?;
+        Ok(Shader::new(&source, shader_type))
     }
 
     unsafe fn check_for_errors(handle: u32, shader_type: ShaderType) {
@@ -80,10 +86,11 @@ pub struct Program {
     uniform_cache: HashMap<String, i32>
 }
 
-pub enum UniformType {
+pub enum UniformType<'a> {
     Int(i32),
     Float(f32),
-    Uint(u32)
+    Uint(u32),
+    Matrix4(&'a glam::Mat4)
 }
 
 impl Program {
@@ -177,6 +184,12 @@ impl Program {
             UniformType::Uint(v) => unsafe {
                 gl::Uniform1ui(location, v);
             },
+            UniformType::Matrix4(v) => unsafe {
+                let mut flat_mat = [0f32 ; 16];
+                v.write_cols_to_slice(&mut flat_mat);
+                gl::UniformMatrix4fv(location, 1, gl::FALSE, &flat_mat as *const f32);
+
+            }
             _ => todo!()
         }
     }

@@ -1,14 +1,30 @@
 use super::object::GLObject;
 use gl::types::*;
-use std::mem::size_of;
+use std::{mem::size_of, ops::BitAnd};
 
 
+#[derive(Clone, Copy)]
 pub struct VertexAttribute {
-    count: i32
+    count: i32,
 }
+
 impl VertexAttribute {
-    pub fn with_count(count: i32) -> Self {
+    pub const POSITION  : Self = VertexAttribute { count: 3 };
+    pub const NORMAL    : Self = VertexAttribute { count: 3 };
+    pub const COLOR     : Self = VertexAttribute { count: 3 };
+    pub const UV        : Self = VertexAttribute { count: 2 };
+
+    fn new(count: i32) -> Self {
         VertexAttribute { count }
+    }
+}
+
+impl BitAnd for VertexAttribute {
+    type Output = VertexAttribute;
+    fn bitand(self, rhs: Self) -> Self::Output {
+        VertexAttribute { 
+            count: self.count + rhs.count, 
+        }
     }
 }
 
