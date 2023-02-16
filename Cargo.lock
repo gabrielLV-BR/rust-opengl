@@ -236,12 +236,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "glam"
-version = "0.22.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12f597d56c1bd55a811a1be189459e8fad2bbc272616375602443bdfb37fa774"
-
-[[package]]
 name = "glfw"
 version = "0.51.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -451,9 +445,9 @@ name = "opengl"
 version = "0.1.0"
 dependencies = [
  "gl",
- "glam",
  "glfw",
  "image",
+ "ultraviolet",
 ]
 
 [[package]]
@@ -538,6 +532,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "safe_arch"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "794821e4ccb0d9f979512f9c1973480123f9bd62a90d74ab0f9426fcf8f4a529"
+dependencies = [
+ "bytemuck",
+]
+
+[[package]]
 name = "scoped_threadpool"
 version = "0.1.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -599,6 +602,15 @@ dependencies = [
  "flate2",
  "jpeg-decoder",
  "weezl",
+]
+
+[[package]]
+name = "ultraviolet"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bf2728f3858937f50df6d92b741f53ef8fd5b5ae23b03b73fb9ac891e980df3b"
+dependencies = [
+ "wide",
 ]
 
 [[package]]
@@ -672,6 +684,16 @@ name = "weezl"
 version = "0.1.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9193164d4de03a926d909d3bc7c30543cecb35400c02114792c2cae20d5e2dbb"
+
+[[package]]
+name = "wide"
+version = "0.7.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "feff0a412894d67223777b6cc8d68c0dab06d52d95e9890d5f2d47f10dd9366c"
+dependencies = [
+ "bytemuck",
+ "safe_arch",
+]
 
 [[package]]
 name = "winapi"

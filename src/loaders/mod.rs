@@ -1,5 +1,5 @@
 use std::io;
-use glam::Vec3;
+use ultraviolet::Vec3;
 
 pub mod obj;
 

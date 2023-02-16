@@ -1,8 +1,6 @@
 use core::panic;
 use std::{collections::HashMap, io};
-use gl::{self, types::{GLchar, GLvoid}};
-use glam;
-use image::flat;
+use gl::{self, types::GLchar};
 
 use crate::graphics::object::GLObject;
 
@@ -90,7 +88,7 @@ pub enum UniformType<'a> {
     Int(i32),
     Float(f32),
     Uint(u32),
-    Matrix4(&'a glam::Mat4)
+    Matrix4(&'a ultraviolet::Mat4)
 }
 
 impl Program {
@@ -185,10 +183,7 @@ impl Program {
                 gl::Uniform1ui(location, v);
             },
             UniformType::Matrix4(v) => unsafe {
-                let mut flat_mat = [0f32 ; 16];
-                v.write_cols_to_slice(&mut flat_mat);
-                gl::UniformMatrix4fv(location, 1, gl::FALSE, &flat_mat as *const f32);
-
+                gl::UniformMatrix4fv(location, 1, gl::FALSE, v.as_ptr().cast());
             }
             _ => todo!()
         }

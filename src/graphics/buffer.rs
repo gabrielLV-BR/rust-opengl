@@ -5,7 +5,7 @@ use std::mem::size_of;
 pub struct Buffer<T> {
     handle: u32,
     target: u32,
-    data: Vec<T>
+    pub data: Vec<T>
 }
 
 impl<T> Buffer<T> {
@@ -33,8 +33,8 @@ impl<T> Buffer<T> {
         self.data.len()
     }
 
-    pub fn set_data(&mut self, usage: u32, vertices: Vec<T>) {
-        self.data = vertices;
+    pub fn set_data(&mut self, usage: u32, data: Vec<T>) {
+        self.data = data;
         self.bind();
 
         unsafe {
