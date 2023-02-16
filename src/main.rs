@@ -1,6 +1,7 @@
 mod graphics;
 mod loaders;
 mod components;
+mod renderer;
 
 use std::time::Duration;
 
@@ -12,6 +13,8 @@ use crate::graphics::{
     shader::{Shader, ShaderType, Program, UniformType}, 
     texture::Texture, buffer::Buffer
 };
+
+use bevy_ecs as bevy;
 
 fn main() {
     const WIDTH: i32 = 500;
@@ -33,13 +36,9 @@ fn main() {
     glfw.make_context_current(Some(&window));
     glfw.set_swap_interval(glfw::SwapInterval::Sync(1));
 
-    gl::load_with(|s| glfw.get_proc_address_raw(s));
+    let renderer = renderer::Renderer::new(&mut glfw, &window);
 
-    unsafe {
-        let (width, height) = window.get_size();
-        gl::Viewport(0, 0, width, height);
-    }
-
+    
     let vertices: Vec<f32> = vec![
     //   X     Y     Z  |  R     G     B  |  U     V
         -0.5, -0.5,  0.0,  1.0,  0.0,  0.0,  0.0,  1.0,
@@ -52,21 +51,34 @@ fn main() {
     ];
 
     let mut loader = OBJLoader::new();
-    loader.load("assets/prism2.obj").unwrap();
-
+    loader.load("assets/monkey.obj").unwrap();
 
     println!("{:?}", loader.vertices);
     println!("{:?}", loader.indices);
     // loader.vertices.iter().for_each(|v| println!("{v}"));
     // loader.indices.iter().for_each(|v| println!("{v}"));
+    let (models, _) = tobj::load_obj(
+        "assets/monkey.obj", 
+        &tobj::LoadOptions {
+            triangulate: true,
+            ..Default::default()
+        }
+    ).unwrap();
 
+    let vertices = models[0].mesh.positions.clone();
+    let indices = models[0].mesh.indices.clone();
 
     let aspect = window.get_size().0 as f32 / window.get_size().1 as f32;
     let fov = 90f32;
 
     let mut model;
     let view =ultraviolet::Mat4::identity();
-    let proj = ultraviolet::projection::perspective_gl(fov, aspect, 0.01f32, 1000.0f32);
+    let proj = ultraviolet::projection::perspective_gl(
+        fov, 
+        aspect, 
+        0.01f32, 
+        1000.0f32
+    );
 
     let mut vao = VertexArray::new();
     let mut vbo = Buffer::<f32>::new(gl::ARRAY_BUFFER);
@@ -76,8 +88,8 @@ fn main() {
 
     vao.vertex_attributes(vec![
         VertexAttribute::POSITION,
-        VertexAttribute::COLOR,
-        VertexAttribute::UV,
+        // VertexAttribute::COLOR,
+        // VertexAttribute::UV,
     ]);
 
     vbo.set_data(gl::STATIC_DRAW, vertices);
@@ -93,9 +105,11 @@ fn main() {
     let vertex_shader   = 
         Shader::from_file("assets/shaders/basic.vert", ShaderType::Vertex)
         .unwrap();
+
     let fragment_shader = 
         Shader::from_file("assets/shaders/basic.frag", ShaderType::Fragment)
         .unwrap();
+
     let program = Program::new(vertex_shader, fragment_shader);
 
     let obama_texture = image::open("assets/textures/obama.jpg").unwrap();
@@ -107,15 +121,16 @@ fn main() {
 
     let mut rotation = 0f32;
 
-    window.set_key_polling(true);
+    let mut render_world = bevy::world::World::new();
+    let mut render_schedule = bevy::schedule::Schedule::default();
 
     while !window.should_close() {
         time = glfw.get_time() as f32;
         delta = time - last_time;
 
-        println!("Delta: {}", delta);
+        // println!("Delta: {}", delta);
 
-        model = ultraviolet::Mat4::from_rotation_x(rotation).translated(&Vec3::new(0., 0., -3.));
+        model = ultraviolet::Mat4::from_rotation_x(time).translated(&Vec3::new(0., 0., -3.));
 
         unsafe {
             gl::ClearColor(1.0, 1.0, 1.0, 1.0);
@@ -141,15 +156,6 @@ fn main() {
         glfw.poll_events();
         window.swap_buffers();
 
-        for (_, event) in glfw::flush_messages(&events) {
-            match event {
-                glfw::WindowEvent::Key(glfw::Key::D, _, glfw::Action::Repeat, _) => {
-                    rotation += 0.01f32;
-                },
-                _ => {}
-            }
-        }
-
         let wait_time = FRAME_DURATION;
         let curr_frame_time = glfw.get_time() as f32 - time;
         let dur = 1000.0 * ( wait_time - curr_frame_time ) + 0.5;
@@ -160,6 +166,8 @@ fn main() {
 
         last_time = time;
     }
+
+    renderer.dispose();
 
     drop(window);
     drop(glfw);

@@ -1,5 +1,7 @@
+use bevy_ecs::system::Resource;
 use ultraviolet::Mat4;
 
+#[derive(Resource)]
 pub struct Camera {
     pub view_matrix: Mat4,
     pub projection_matrix: Mat4,
