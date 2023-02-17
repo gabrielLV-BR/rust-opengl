@@ -3,9 +3,10 @@ mod components;
 
 use glfw::{Glfw, Window};
 use bevy_ecs::{world::World, schedule::Schedule, prelude::Query, system::Res};
-use api::{texture::Texture, vao::VertexArray};
 
-use self::{api::{shader::{Program, UniformType}, object::GLObject}, components::camera::Camera};
+use crate::server::texture_server::TextureServer;
+
+use self::{api::{shader::{Program, UniformType}, object::GLObject}, components::{camera::Camera, transform::Transform, mesh::Mesh}};
 
 pub struct Renderer {
     world: World,
@@ -46,28 +47,30 @@ impl Renderer {
 
     pub fn render(
         camera: &Res<Camera>,
-        q: Query<(&VertexArray, &Program, &Texture)>
+        texture_server: Res<&TextureServer>,
+        q: Query<(&Mesh, &Program, &Transform)>
     ) {
-        todo!()
-        // for (vao, program, texture) in q.iter() {
-        //     unsafe {
-        //         texture.bind();
-        //         vao.bind();
-        //         program.bind();
-        //         program.set_uniform("uTexture", UniformType::Int(0));
+        let model = camera.as_ref;
+
+        for (vao, program, texture) in q.iter() {
+            unsafe {
+                texture.bind();
+                vao.bind();
+                program.bind();
+                program.set_uniform("uTexture", UniformType::Int(0));
     
-        //         program.set_uniform("uModelMatrix", UniformType::Matrix4(&model));
-        //         program.set_uniform("uViewMatrix", UniformType::Matrix4(&view));
-        //         program.set_uniform("uProjMatrix", UniformType::Matrix4(&proj));
+                program.set_uniform("uModelMatrix", UniformType::Matrix4(&model));
+                program.set_uniform("uViewMatrix", UniformType::Matrix4(&view));
+                program.set_uniform("uProjMatrix", UniformType::Matrix4(&proj));
     
-        //         gl::DrawElements(
-        //             gl::TRIANGLES, 
-        //             ebo.count() as i32,
-        //             gl::UNSIGNED_INT, 
-        //             0 as *const _
-        //         );
-        //     }
-        // }
+                gl::DrawElements(
+                    gl::TRIANGLES, 
+                    ebo.count() as i32,
+                    gl::UNSIGNED_INT, 
+                    0 as *const _
+                );
+            }
+        }
     }
 
     pub fn dispose(self) {

@@ -1,4 +1,5 @@
 mod renderer;
+mod server;
 
 use glfw::{self, Context};
 use std::time::Duration;
