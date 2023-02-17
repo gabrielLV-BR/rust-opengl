@@ -1,7 +1,9 @@
 use super::object::GLObject;
-use gl::{self, types::*};
+use bevy_ecs::prelude::Component;
+use gl;
 use std::mem::size_of;
 
+#[derive(Component)]
 pub struct Buffer<T> {
     handle: u32,
     target: u32,
@@ -10,7 +12,6 @@ pub struct Buffer<T> {
 
 impl<T> Buffer<T> {
     pub fn new(target: u32) -> Self {
-
         let mut handle = 0u32;
 
         unsafe {

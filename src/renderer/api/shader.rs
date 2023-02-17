@@ -1,14 +1,15 @@
-use core::panic;
 use std::{collections::HashMap, io};
+use bevy_ecs::prelude::Component;
 use gl::{self, types::GLchar};
 
-use crate::graphics::object::GLObject;
+use crate::renderer::api::object::GLObject;
 
 pub enum ShaderType {
     Vertex,
     Fragment
 }
 
+#[derive(Component)]
 pub struct Shader {
     handle: u32
 }
@@ -79,6 +80,7 @@ impl Drop for Shader {
     }
 }
 
+#[derive(Component)]
 pub struct Program {
     handle: u32,
     uniform_cache: HashMap<String, i32>

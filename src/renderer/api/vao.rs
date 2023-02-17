@@ -1,4 +1,5 @@
 use super::object::GLObject;
+use bevy_ecs::prelude::Component;
 use gl::types::*;
 use std::{mem::size_of, ops::BitAnd};
 
@@ -28,7 +29,7 @@ impl BitAnd for VertexAttribute {
     }
 }
 
-
+#[derive(Component)]
 pub struct VertexArray {
     handle: u32,
 }

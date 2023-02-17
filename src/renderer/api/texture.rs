@@ -1,8 +1,10 @@
+use bevy_ecs::prelude::Component;
 use gl::{self, types::*};
 use image;
 
 use super::object::GLObject;
 
+#[derive(Component)]
 pub struct Texture {
     pub handle: u32
 }
