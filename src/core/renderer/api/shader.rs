@@ -2,7 +2,7 @@ use std::{collections::HashMap, io};
 use bevy_ecs::prelude::Component;
 use gl::{self, types::GLchar};
 
-use crate::renderer::api::object::GLObject;
+use crate::core::renderer::api::object::GLObject;
 
 pub enum ShaderType {
     Vertex,
@@ -90,7 +90,8 @@ pub enum UniformType<'a> {
     Int(i32),
     Float(f32),
     Uint(u32),
-    Matrix4(&'a ultraviolet::Mat4)
+    Matrix4(&'a ultraviolet::Mat4),
+    Vec3(&'a ultraviolet::Vec3)
 }
 
 impl Program {
@@ -186,8 +187,10 @@ impl Program {
             },
             UniformType::Matrix4(v) => unsafe {
                 gl::UniformMatrix4fv(location, 1, gl::FALSE, v.as_ptr().cast());
+            },
+            UniformType::Vec3(v) => unsafe {
+                gl::Uniform3fv(location, 1, v.as_ptr());
             }
-            _ => todo!()
         }
     }
 }

@@ -1,5 +1,5 @@
-mod renderer;
-mod server;
+mod core;
+mod servers;
 
 use glfw::{self, Context};
 use std::time::Duration;
@@ -17,14 +17,14 @@ fn main() {
     glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
     glfw.window_hint(glfw::WindowHint::DoubleBuffer(true));
 
-    let (mut window, events) = glfw
+    let (mut window, _) = glfw
         .create_window(WIDTH as u32, HEIGHT as u32, "Hello", glfw::WindowMode::Windowed)
         .unwrap();
 
     glfw.make_context_current(Some(&window));
     glfw.set_swap_interval(glfw::SwapInterval::Sync(1));
 
-    let mut renderer = renderer::Renderer::new(&mut glfw, &window);
+    let mut renderer = core::renderer::Renderer::new(&mut glfw, &window);
 
     let mut delta = 0f32;
     let mut time = 0f32;

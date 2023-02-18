@@ -10,6 +10,9 @@ pub struct Buffer<T> {
     pub data: Vec<T>
 }
 
+pub type VertexBuffer = Buffer<f32>;
+pub type ElementBuffer = Buffer<u32>;
+
 impl<T> Buffer<T> {
     pub fn new(target: u32) -> Self {
         let mut handle = 0u32;
@@ -50,7 +53,15 @@ impl<T> Buffer<T> {
         self.unbind();
     }
 }
-
+ 
+impl<T> Drop for Buffer<T> {
+    fn drop(&mut self) {
+        unsafe {
+            gl::DeleteBuffers(1, &mut self.handle);
+        }
+    }
+}
+ 
 impl<T> GLObject for Buffer<T> {
     fn bind(&self) {
         unsafe {

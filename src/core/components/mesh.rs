@@ -1,4 +1,8 @@
-use crate::renderer::api::{buffer::Buffer, texture::Texture, vao::{VertexAttribute, VertexArray}, object::GLObject};
+use crate::core::renderer::api::{
+    buffer::Buffer, 
+    vao::{VertexAttribute, VertexArray}, 
+    object::GLObject
+};
 use bevy_ecs::prelude::Component;
 use gl;
 
@@ -12,11 +16,11 @@ pub struct Mesh {
 
 impl Mesh {
     pub fn new(vertex_data: Vec<f32>, index_data: Vec<u32>, texture_handle: Option<u32>) -> Self {
-        let mut vertices : Buffer<f32> = Buffer::new(gl::STATIC_DRAW);
-        let mut indices : Buffer<u32> = Buffer::new(gl::STATIC_DRAW);
+        let mut vertices : Buffer<f32> = Buffer::new(gl::ARRAY_BUFFER);
+        let mut indices : Buffer<u32> = Buffer::new(gl::ELEMENT_ARRAY_BUFFER);
         let mut vao = VertexArray::new();
 
-        vao.vertex_attributes(vec![
+        vao.set_vertex_attributes(vec![
             VertexAttribute::POSITION
         ]);
         vao.bind();
@@ -24,10 +28,12 @@ impl Mesh {
         vertices.bind();
         indices.bind();
 
-        vertices.set_data(gl::ARRAY_BUFFER, vertex_data);
-        indices.set_data(gl::ELEMENT_ARRAY_BUFFER, index_data); 
+        vertices.set_data(gl::STATIC_DRAW, vertex_data);
+        indices.set_data(gl::STATIC_DRAW, index_data); 
 
         vao.unbind();
+        vertices.unbind();
+        indices.unbind();
 
         Mesh {
             vao,

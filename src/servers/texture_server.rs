@@ -1,17 +1,16 @@
 use std::collections::HashMap;
-
 use bevy_ecs::system::Resource;
 
 use super::AssetServerTrait;
-use crate::renderer::api::texture::Texture;
+use crate::core::renderer::api::texture::Texture;
 
 #[derive(Resource)]
 pub struct TextureServer {
     map: HashMap<String, Texture>,
 }
 
-impl<> AssetServerTrait<Texture> for TextureServer {
-    fn init() -> Self {
+impl<> AssetServerTrait<Texture, image::error::ImageError> for TextureServer {
+    fn new() -> Self {
         TextureServer { 
             map: HashMap::new()
         }        

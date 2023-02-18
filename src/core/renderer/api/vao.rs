@@ -1,7 +1,7 @@
 use super::object::GLObject;
 use bevy_ecs::prelude::Component;
 use gl::types::*;
-use std::{mem::size_of, ops::BitAnd};
+use std::mem::size_of;
 
 
 #[derive(Clone, Copy)]
@@ -14,19 +14,6 @@ impl VertexAttribute {
     pub const NORMAL    : Self = VertexAttribute { count: 3 };
     pub const COLOR     : Self = VertexAttribute { count: 3 };
     pub const UV        : Self = VertexAttribute { count: 2 };
-
-    fn new(count: i32) -> Self {
-        VertexAttribute { count }
-    }
-}
-
-impl BitAnd for VertexAttribute {
-    type Output = VertexAttribute;
-    fn bitand(self, rhs: Self) -> Self::Output {
-        VertexAttribute { 
-            count: self.count + rhs.count, 
-        }
-    }
 }
 
 #[derive(Component, Debug)]
@@ -47,8 +34,7 @@ impl VertexArray {
         }
     }
 
-    pub fn vertex_attributes(&mut self, attribs: Vec<VertexAttribute>) {
-
+    pub fn set_vertex_attributes(&mut self, attribs: Vec<VertexAttribute>) {
         let stride = attribs.iter().map(|a| a.count).sum::<i32>() * size_of::<f32>() as i32;
         let mut offset = 0;
 
@@ -68,7 +54,7 @@ impl VertexArray {
                 offset += attribute.count * size_of::<f32>() as i32;
             }
         }
-        self.bind();
+        self.unbind();
     }
 }
 
