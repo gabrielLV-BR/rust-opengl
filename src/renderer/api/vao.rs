@@ -29,7 +29,7 @@ impl BitAnd for VertexAttribute {
     }
 }
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct VertexArray {
     handle: u32,
 }

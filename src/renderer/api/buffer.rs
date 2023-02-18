@@ -3,7 +3,7 @@ use bevy_ecs::prelude::Component;
 use gl;
 use std::mem::size_of;
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct Buffer<T> {
     handle: u32,
     target: u32,

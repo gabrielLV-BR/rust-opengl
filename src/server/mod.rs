@@ -5,8 +5,8 @@ pub struct NotFound {}
 
 pub trait AssetServerTrait<T> {
     fn init() -> Self;
-    fn load(path: &str) -> Option<T>;
-    fn get(handle: u32) -> Result<T, NotFound>;
-    fn unload(handle: u32);
-    fn dispose() -> Self;
+    fn load(&mut self, path: &str) -> Result<&T, image::ImageError>;
+    fn get(&self, path: &str) -> Option<&T>;
+    fn unload(&mut self, path: &str);
+    fn dispose(self);
 }
