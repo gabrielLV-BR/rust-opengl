@@ -29,6 +29,14 @@ impl<T> Buffer<T> {
         }
     }
 
+    pub fn vertex_buffer() -> Buffer<f32> {
+        VertexBuffer::new(gl::ARRAY_BUFFER)
+    }
+
+    pub fn element_buffer() -> Buffer<u32> {
+        ElementBuffer::new(gl::ELEMENT_ARRAY_BUFFER)
+    }
+
     pub fn size(&self) -> usize {
         self.data.len() * size_of::<T>()
     }
@@ -37,7 +45,7 @@ impl<T> Buffer<T> {
         self.data.len()
     }
 
-    pub fn set_data(&mut self, usage: u32, data: Vec<T>) {
+    pub fn with_data(mut self, usage: u32, data: Vec<T>) -> Self {
         self.data = data;
         self.bind();
 
@@ -53,6 +61,7 @@ impl<T> Buffer<T> {
         }
 
         self.unbind();
+        self
     }
 }
  

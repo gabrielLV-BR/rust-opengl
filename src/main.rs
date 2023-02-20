@@ -2,9 +2,14 @@ mod core;
 mod servers;
 
 use glfw::{self, Context};
-use std::{time::Duration, mem::size_of_val};
+use std::time::Duration;
 
-use crate::{servers::mesh_server::MeshServer, core::{renderer::api::{shader::{Program, Shader, ShaderType}, object::GLObject, vao::{VertexArray, VertexAttribute}, buffer::{VertexBuffer, ElementBuffer}}, components::mesh::{MeshData, MeshInstance}}};
+use crate::core::renderer::api::{
+    shader::{Shader, ShaderType, Program}, 
+    object::GLObject, 
+    vao::{VertexArray, VertexAttribute}, 
+    buffer::{VertexBuffer, ElementBuffer}
+};
 
 fn main() {
     const WIDTH: i32 = 500;
@@ -53,66 +58,24 @@ fn main() {
         0, 1, 2
     ];
 
-    // let mut vao = VertexArray::new();
-    // vao.set_vertex_attributes(vec![VertexAttribute::POSITION]);
-    // vao.bind();
+    let vao = VertexArray::new()
+        .with_vertex_attributes(vec![VertexAttribute::POSITION]);
+    vao.bind();
 
-    // let mut vbo = VertexBuffer::new(gl::ARRAY_BUFFER);
-    // vbo.set_data(gl::STATIC_DRAW, vertices);
+    let vbo = VertexBuffer::vertex_buffer()
+        .with_data(gl::STATIC_DRAW, vertices);
+    vbo.bind();
 
-    // let mut ebo = ElementBuffer::new(gl::ELEMENT_ARRAY_BUFFER);
-    // ebo.set_data(gl::STATIC_DRAW, indices);
+    let ebo = ElementBuffer::element_buffer()
+        .with_data(gl::STATIC_DRAW, indices);
+    ebo.bind();
 
-    // vbo.bind();
-    // ebo.bind();
+    vao.unbind();
 
-    // vao.unbind();
+    let vertex_shader = Shader::from_file("assets/shaders/debug.vert", ShaderType::Vertex).unwrap();
+    let fragment_shader = Shader::from_file("assets/shaders/debug.frag", ShaderType::Fragment).unwrap();
 
-    let mut vao = 0u32;
-    let mut vbo = 0u32;
-    let mut ebo = 0u32;
-
-    unsafe {
-        gl::GenVertexArrays(1, &mut vao);
-        gl::BindVertexArray(vao);
-
-        gl::GenBuffers(2, [&mut vbo, &mut ebo].as_mut_ptr().cast());
-
-        gl::BindBuffer(gl::ARRAY_BUFFER, vbo);
-        gl::BufferData(
-            gl::ARRAY_BUFFER,
-            (vertices.len() * std::mem::size_of::<f32>()) as isize,
-            vertices.as_ptr().cast(),
-            gl::STATIC_DRAW
-        );
-
-        gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, ebo);
-        gl::BufferData(
-            gl::ELEMENT_ARRAY_BUFFER,
-            (indices.len() * std::mem::size_of::<u32>()) as isize,
-            indices.as_ptr().cast(),
-            gl::STATIC_DRAW
-        );
-
-        gl::VertexAttribPointer(
-            0, 
-            3, 
-            gl::FLOAT, 
-            gl::FALSE,
-            (3 * std::mem::size_of::<f32>()) as i32,
-            0 as *const _
-        );
-        gl::EnableVertexAttribArray(0);
-
-        gl::BindVertexArray(0);
-    }
-
-    // let instance = MeshInstance::new(meshes.first_mut().unwrap());
-
-    let program = Program::new(
-        Shader::from_file("assets/shaders/debug.vert", ShaderType::Vertex).unwrap(),
-        Shader::from_file("assets/shaders/debug.frag", ShaderType::Fragment).unwrap()
-    );
+    let program = Program::new(vertex_shader, fragment_shader);
 
     while !window.should_close() {
         time = glfw.get_time() as f32;
@@ -122,7 +85,7 @@ fn main() {
             gl::ClearColor(0.0, 0.0, 0.0, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
 
-            gl::BindVertexArray(vao);
+            vao.bind();
             program.bind();
             // vao.bind();
 

@@ -108,11 +108,11 @@ impl Program {
         drop(vertex_shader);
         drop(fragment_shader);
 
-        let uniform_cache = Program::map_uniforms(handle);
+        // let uniform_cache = Program::map_uniforms(handle);
 
         Self {
             handle,
-            uniform_cache
+            uniform_cache: HashMap::new()
         }
     }
 

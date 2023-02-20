@@ -11,9 +11,9 @@ pub struct VertexAttribute {
 
 impl VertexAttribute {
     pub const POSITION  : Self = VertexAttribute { count: 3 };
-    pub const NORMAL    : Self = VertexAttribute { count: 3 };
-    pub const COLOR     : Self = VertexAttribute { count: 3 };
-    pub const UV        : Self = VertexAttribute { count: 2 };
+    pub const _NORMAL    : Self = VertexAttribute { count: 3 };
+    pub const _COLOR     : Self = VertexAttribute { count: 3 };
+    pub const _UV        : Self = VertexAttribute { count: 2 };
 }
 
 #[derive(Component, Debug)]
@@ -34,7 +34,7 @@ impl VertexArray {
         }
     }
 
-    pub fn set_vertex_attributes(&mut self, attribs: Vec<VertexAttribute>) {
+    pub fn with_vertex_attributes(self, attribs: Vec<VertexAttribute>) -> Self {
         let stride = attribs.iter().map(|a| a.count).sum::<i32>() * size_of::<f32>() as i32;
         let mut offset = 0;
 
@@ -57,6 +57,7 @@ impl VertexArray {
             }
         }
         self.unbind();
+        self
     }
 }
 
