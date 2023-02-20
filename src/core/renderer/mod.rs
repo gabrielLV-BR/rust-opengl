@@ -7,11 +7,9 @@ use bevy::prelude::*;
 
 use render_stages::*;
 
-use crate::servers::{texture_server::TextureServer, AssetServerTrait, mesh_server::{MeshServer, self}};
+use crate::servers::{texture_server::TextureServer, mesh_server::MeshServer};
 
-use self::api::{shader::{Program, Shader, ShaderType}, object::GLObject, vao::{VertexArray, VertexAttribute}, buffer::{VertexBuffer, ElementBuffer}};
-
-use super::components::mesh::{MeshInstance, MeshData, self};
+use self::api::{shader::{Program, Shader, ShaderType}, object::GLObject, vao::VertexArray, buffer::{VertexBuffer, ElementBuffer}};
 
 const vss : &str = r#"
     #version 330 core
