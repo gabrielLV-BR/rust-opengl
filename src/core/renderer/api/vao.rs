@@ -18,7 +18,7 @@ impl VertexAttribute {
 
 #[derive(Component, Debug)]
 pub struct VertexArray {
-    handle: u32,
+    pub handle: u32,
 }
 
 impl VertexArray {

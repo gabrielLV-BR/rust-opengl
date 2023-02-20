@@ -6,11 +6,12 @@ use bevy_ecs as bevy;
 use bevy::prelude::*;
 
 use render_stages::*;
-use ultraviolet::Vec3;
 
-use crate::servers::{texture_server::TextureServer, AssetServerTrait};
+use crate::servers::{texture_server::TextureServer, AssetServerTrait, mesh_server::{MeshServer, self}};
 
-use self::api::{shader::{Program, Shader, ShaderType, UniformType}, object::GLObject, vao::VertexArray, buffer::{Buffer, VertexBuffer, ElementBuffer}};
+use self::api::{shader::{Program, Shader, ShaderType}, object::GLObject, vao::VertexArray, buffer::{VertexBuffer, ElementBuffer}};
+
+use super::components::mesh::{MeshInstance, MeshData, self};
 
 pub struct Renderer {
     world: bevy::world::World,
@@ -20,6 +21,7 @@ pub struct Renderer {
 
 fn setup_object(
     mut command: bevy::system::Commands,
+    mut mesh_server: ResMut<MeshServer>
     // mut texture_server: ResMut<TextureServer>
 ) {
 
@@ -35,28 +37,26 @@ fn setup_object(
         0, 1, 2
     ];
 
-    // mesh
-    // let mesh = Mesh::new(
-    //     vertices, 
-    //     indices, 
-    //     Some(texture.handle)
-    // );
+    let mesh = MeshData::new(vertices, indices);    
+    let handle = mesh_server.as_mut().insert(mesh);
+    let mesh_instance = mesh_server.as_mut().new_instance(handle).unwrap();
 
-    let mut vertex_array = api::vao::VertexArray::new();
-    vertex_array.set_vertex_attributes(vec![
-        api::vao::VertexAttribute::POSITION
-    ]);
-    vertex_array.bind();
 
-    let mut vertex_buffer = VertexBuffer::new(gl::ARRAY_BUFFER);
-    let mut element_buffer = ElementBuffer::new(gl::ELEMENT_ARRAY_BUFFER);
+    // let mut vertex_array = api::vao::VertexArray::new();
+    // vertex_array.set_vertex_attributes(vec![
+    //     api::vao::VertexAttribute::POSITION
+    // ]);
+    // vertex_array.bind();
 
-    vertex_buffer.set_data(gl::STATIC_COPY, vertices);
-    element_buffer.set_data(gl::STATIC_DRAW, indices);    
+    // let mut vertex_buffer = VertexBuffer::new(gl::ARRAY_BUFFER);
+    // let mut element_buffer = ElementBuffer::new(gl::ELEMENT_ARRAY_BUFFER);
 
-    vertex_buffer.bind();
-    element_buffer.bind();
-    vertex_array.unbind();
+    // vertex_buffer.set_data(gl::STATIC_COPY, vertices);
+    // element_buffer.set_data(gl::STATIC_DRAW, indices);    
+
+    // vertex_buffer.bind();
+    // element_buffer.bind();
+    // vertex_array.unbind();
 
     // program
     let vertex_shader = Shader::from_file(
@@ -71,7 +71,8 @@ fn setup_object(
 
     let program = Program::new(vertex_shader, fragment_shader);
     
-    command.spawn((vertex_array, vertex_buffer, element_buffer, program));
+    command.spawn((mesh_instance, program));
+    // command.spawn((vertex_array, vertex_buffer, element_buffer, program));
 }
 
 impl Renderer {
@@ -109,6 +110,7 @@ impl Renderer {
         self.update_schedule.add_stage(CleanupStage, SystemStage::parallel());
     
         self.world.insert_resource(TextureServer::new());
+        self.world.insert_resource(MeshServer::new());
 
         self.init_schedule.add_system_to_stage(InitStage, setup_object);
         self.update_schedule.add_system_to_stage(RenderStage, Self::render);
@@ -117,27 +119,24 @@ impl Renderer {
     }
 
     pub fn update(&mut self, _delta: f32) {
-        self.update_schedule.run_once(&mut self.world);
-
         unsafe {
             gl::ClearColor(0.1, 0.1, 0.1, 1.0);
             gl::Clear(gl::COLOR_BUFFER_BIT);
         }
+
+        self.update_schedule.run_once(&mut self.world);
     }
 
     pub fn render(
-        q: Query<(&VertexArray, &VertexBuffer, &ElementBuffer, &Program)>
+        q: Query<(&MeshInstance, &Program)>
     ) {
         // let model = camera.as_ref;
 
-        for (vao, vbo, ebo, program) in q.iter() {
-
-            println!("{:?}\n{:?}", vao, program);
+        for (instance, program) in q.iter() {
 
             program.bind();
-            vao.bind();
-            vbo.bind();
-            ebo.bind();
+            instance.bind();
+
             // program.set_uniform("aColor", UniformType::Vec3(&Vec3::new(1.0, 0.0, 1.0)));
 
             unsafe {
@@ -152,7 +151,7 @@ impl Renderer {
 
                 gl::DrawElements(
                     gl::TRIANGLES, 
-                    3,
+                    instance.element_count as i32,
                     gl::UNSIGNED_INT, 
                     0 as *const _
                 );

@@ -82,7 +82,7 @@ impl Drop for Shader {
 
 #[derive(Component, Debug)]
 pub struct Program {
-    handle: u32,
+    pub handle: u32,
     uniform_cache: HashMap<String, i32>
 }
 
