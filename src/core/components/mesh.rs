@@ -16,20 +16,19 @@ pub struct MeshData {
 
 impl MeshData {
     pub fn new(vertex_data: Vec<f32>, index_data: Vec<u32>) -> Self {
-        let vao = VertexArray::new()
-            .with_vertex_attributes(vec![
-            VertexAttribute::POSITION
-        ]);
-
+        let vao = VertexArray::new();
+        //     .with_vertex_attributes(vec![
+        //     VertexAttribute::POSITION
+        // ]);
         vao.bind();
 
-        let vertices = 
-            VertexBuffer::new(gl::ARRAY_BUFFER)
-                .with_data(gl::STATIC_DRAW, vertex_data);
+        let mut vertices = 
+            VertexBuffer::new(gl::ARRAY_BUFFER);        
+        vertices.set_data(gl::STATIC_DRAW, vertex_data);
 
-        let indices = 
-            ElementBuffer::new(gl::ELEMENT_ARRAY_BUFFER)
-                .with_data(gl::STATIC_DRAW, index_data);
+        let mut indices = 
+            ElementBuffer::new(gl::ELEMENT_ARRAY_BUFFER);
+        indices.set_data(gl::STATIC_DRAW, index_data);
 
         vertices.bind();
         indices.bind();
@@ -39,6 +38,10 @@ impl MeshData {
             vertices,
             indices
         }
+    }
+
+    pub fn handle(&self) -> u32 {
+        self.vao.handle
     }
 
     pub fn from_model_list(models: Vec<Model>) -> MeshData {

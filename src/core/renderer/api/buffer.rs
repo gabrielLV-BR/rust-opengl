@@ -37,21 +37,22 @@ impl<T> Buffer<T> {
         self.data.len()
     }
 
-    pub fn with_data(mut self, usage: u32, data: Vec<T>) -> Self {
+    pub fn set_data(&mut self, usage: u32, data: Vec<T>) {
         self.data = data;
         self.bind();
+
+        println!("{}", self.size());
 
         unsafe {
             gl::BufferData(
                 self.target,
-                self.data.len() as isize * size_of::<T>() as isize,
+                self.size() as isize,
                 self.data.as_ptr().cast(),
                 usage
             );
         }
 
         self.unbind();
-        self
     }
 }
  

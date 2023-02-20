@@ -94,12 +94,12 @@ fn setup_object(
     // command.spawn((mesh_instance, program));
     command.spawn(
         (
-            VertexArray::new()
-                .with_vertex_attributes(vec![VertexAttribute::POSITION]),
-            VertexBuffer::new(gl::ARRAY_BUFFER)
-                .with_data(gl::STATIC_DRAW, vertices), 
-            ElementBuffer::new(gl::ELEMENT_ARRAY_BUFFER)
-                .with_data(gl::STATIC_DRAW, indices), 
+            VertexArray::new(),
+                // .with_vertex_attributes(vec![VertexAttribute::POSITION]),
+            VertexBuffer::new(gl::ARRAY_BUFFER),
+                // .with_data(gl::STATIC_DRAW, vertices), 
+            ElementBuffer::new(gl::ELEMENT_ARRAY_BUFFER),
+                // .with_data(gl::STATIC_DRAW, indices), 
             Program::new(vertex_shader, fragment_shader)
         )
     );
@@ -128,17 +128,17 @@ impl Renderer {
             0.5, -0.5, 0.0
         ];
 
-        let vao = VertexArray::new()
-            .with_vertex_attributes(vec![
-                VertexAttribute::POSITION
-            ]);
+        let vao = VertexArray::new();
+        //     .with_vertex_attributes(vec![
+        //         VertexAttribute::POSITION
+        //     ]);
     
-        let vbo = VertexBuffer::new(gl::ARRAY_BUFFER)
-            .with_data(gl::STATIC_DRAW, vertices);
+        let vbo = VertexBuffer::new(gl::ARRAY_BUFFER);
+            // .with_data(gl::STATIC_DRAW, vertices);
 
-        vao.bind();
+        // vao.bind();
         vbo.bind();
-        vao.unbind();
+        // vao.unbind();
 
         let program = Program::new(
             Shader::new(vss, ShaderType::Vertex),

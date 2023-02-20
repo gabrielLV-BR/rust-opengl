@@ -4,6 +4,8 @@ mod servers;
 use glfw::{self, Context};
 use std::time::Duration;
 
+use crate::{servers::mesh_server::MeshServer, core::{renderer::api::{shader::{Program, Shader, ShaderType}, object::GLObject, vao::{VertexArray, VertexAttribute}, buffer::{VertexBuffer, ElementBuffer}}, components::mesh::{MeshData, MeshInstance}}};
+
 fn main() {
     const WIDTH: i32 = 500;
     const HEIGHT: i32 = 500;
@@ -22,19 +24,76 @@ fn main() {
         .unwrap();
 
     glfw.make_context_current(Some(&window));
-    glfw.set_swap_interval(glfw::SwapInterval::Sync(1));
+    // glfw.set_swap_interval(glfw::SwapInterval::Sync(1));
 
-    let mut renderer = core::renderer::Renderer::new(&mut glfw, &window);
+    glfw.make_context_current(Some(&window));
+
+    gl::load_with(
+        |s| glfw.get_proc_address_raw(s)
+    );
+    
+    unsafe {
+        let (width, height) = window.get_size();
+        gl::Viewport(0, 0, width, height);
+    }
+
+    // let mut renderer = core::renderer::Renderer::new(&mut glfw, &window);
 
     let mut delta = 0f32;
     let mut time = 0f32;
     let mut last_time = glfw.get_time() as f32;
 
+    let vertices = vec![
+        -0.5f32, -0.5, 0.0,
+        0.0, 0.5, 0.0,
+        0.5, -0.5, 0.0
+    ];
+
+    let indices: Vec<u32> = vec![
+        0, 1, 2
+    ];
+
+    let mut vao = VertexArray::new();
+    vao.set_vertex_attributes(vec![VertexAttribute::POSITION]);
+    vao.bind();
+
+    let mut vbo = VertexBuffer::new(gl::ARRAY_BUFFER);
+    vbo.set_data(gl::STATIC_DRAW, vertices);
+
+    let mut ebo = ElementBuffer::new(gl::ELEMENT_ARRAY_BUFFER);
+    ebo.set_data(gl::STATIC_DRAW, indices);
+
+    vbo.bind();
+    ebo.bind();
+
+    vao.unbind(); 
+
+    // let instance = MeshInstance::new(meshes.first_mut().unwrap());
+
+    let program = Program::new(
+        Shader::from_file("assets/shaders/debug.vert", ShaderType::Vertex).unwrap(),
+        Shader::from_file("assets/shaders/debug.frag", ShaderType::Fragment).unwrap()
+    );
+
     while !window.should_close() {
         time = glfw.get_time() as f32;
         delta = time - last_time;
 
-        renderer.update(delta);
+        unsafe {
+            gl::ClearColor(0.0, 0.0, 0.0, 1.0);
+            gl::Clear(gl::COLOR_BUFFER_BIT);
+
+            program.bind();
+            vao.bind();
+
+            gl::DrawElements(
+                gl::TRIANGLES,
+                3,
+                gl::UNSIGNED_INT,
+                0 as *const _
+            )
+        }
+        // renderer.update(delta);
 
         glfw.poll_events();
         window.swap_buffers();
@@ -50,7 +109,7 @@ fn main() {
         last_time = time;
     }
 
-    renderer.dispose();
+    // renderer.dispose();
 
     drop(window);
     drop(glfw);

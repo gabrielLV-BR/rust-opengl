@@ -17,10 +17,14 @@ impl MeshServer {
         }        
     }
 
-    pub fn insert(&mut self, mesh: MeshData) -> u32 {
-        let handle = mesh.vao.handle;
-        self.map.insert(handle, mesh);
-        handle
+    pub fn new_mesh(&mut self, vertices: Vec<f32>, indices: Vec<u32>) -> &mut MeshData {
+        let mesh_data = MeshData::new(
+            vertices, indices
+        );
+        let key = mesh_data.vao.handle;
+
+        self.map.insert(key, mesh_data);
+        self.map.get_mut(&key).unwrap()
     }
 
     pub fn new_instance(&mut self, key: u32) -> Option<MeshInstance> {
