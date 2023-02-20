@@ -51,6 +51,10 @@ impl Texture {
 }
 
 impl GLObject for Texture {
+    fn handle(&self) -> u32 {
+        self.handle    
+    }
+
     fn bind(&self) {
         unsafe {
             gl::BindTexture(gl::TEXTURE_2D, self.handle);

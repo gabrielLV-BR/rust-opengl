@@ -79,9 +79,11 @@ impl Drop for Shader {
     }
 }
 
+//
+
 #[derive(Component, Debug)]
 pub struct Program {
-    pub handle: u32,
+    handle: u32,
     uniform_cache: HashMap<String, i32>
 }
 
@@ -195,6 +197,10 @@ impl Program {
 }
 
 impl GLObject for Program {
+    fn handle(&self) -> u32 {
+        self.handle    
+    }
+
     fn bind(&self) {
         unsafe {
             gl::UseProgram(self.handle);

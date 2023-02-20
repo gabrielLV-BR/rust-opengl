@@ -18,7 +18,7 @@ impl VertexAttribute {
 
 #[derive(Component, Debug)]
 pub struct VertexArray {
-    pub handle: u32,
+    handle: u32,
 }
 
 impl VertexArray {
@@ -32,6 +32,14 @@ impl VertexArray {
         VertexArray { 
             handle
         }
+    }
+
+    pub fn bind_with(&self, objects: Vec<&dyn GLObject>) {
+        self.bind();
+        for obj in objects {
+            obj.bind();
+        }
+        self.unbind();
     }
 
     pub fn with_vertex_attributes(self, attribs: Vec<VertexAttribute>) -> Self {
@@ -62,6 +70,10 @@ impl VertexArray {
 }
 
 impl GLObject for VertexArray {
+    fn handle(&self) -> u32 {
+        self.handle
+    }
+
     fn bind(&self) {
         unsafe {
             gl::BindVertexArray(self.handle);

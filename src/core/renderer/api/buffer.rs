@@ -74,6 +74,10 @@ impl<T> Drop for Buffer<T> {
 }
  
 impl<T> GLObject for Buffer<T> {
+    fn handle(&self) -> u32 {
+        self.handle    
+    }
+
     fn bind(&self) {
         unsafe {
             gl::BindBuffer(self.target, self.handle);
