@@ -50,7 +50,6 @@ impl Shader {
             let mut len = 0;
             gl::GetShaderiv(handle, gl::INFO_LOG_LENGTH, &mut len);
             let mut info_log = Vec::with_capacity(len as usize);
-            info_log.set_len(len as usize - 1);
 
             gl::GetShaderInfoLog(
                 handle, 

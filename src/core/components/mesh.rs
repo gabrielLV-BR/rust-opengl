@@ -1,5 +1,5 @@
 use crate::core::renderer::api::{
-    buffer::Buffer, 
+    buffer::{Buffer, VertexBuffer, ElementBuffer}, 
     vao::{VertexAttribute, VertexArray}, 
     object::GLObject
 };
@@ -16,24 +16,23 @@ pub struct MeshData {
 
 impl MeshData {
     pub fn new(vertex_data: Vec<f32>, index_data: Vec<u32>) -> Self {
-        let mut vertices : Buffer<f32> = Buffer::new(gl::ARRAY_BUFFER);
-        let mut indices : Buffer<u32> = Buffer::new(gl::ELEMENT_ARRAY_BUFFER);
-        let mut vao = VertexArray::new();
-
-        vao.set_vertex_attributes(vec![
+        let vao = VertexArray::new()
+            .with_vertex_attributes(vec![
             VertexAttribute::POSITION
         ]);
+
         vao.bind();
+
+        let vertices = 
+            VertexBuffer::new(gl::ARRAY_BUFFER)
+                .with_data(gl::STATIC_DRAW, vertex_data);
+
+        let indices = 
+            ElementBuffer::new(gl::ELEMENT_ARRAY_BUFFER)
+                .with_data(gl::STATIC_DRAW, index_data);
 
         vertices.bind();
         indices.bind();
-
-        vertices.set_data(gl::STATIC_DRAW, vertex_data);
-        indices.set_data(gl::STATIC_DRAW, index_data); 
-
-        vao.unbind();
-        vertices.unbind();
-        indices.unbind();
 
         MeshData {
             vao,

@@ -34,7 +34,7 @@ impl VertexArray {
         }
     }
 
-    pub fn set_vertex_attributes(&mut self, attribs: Vec<VertexAttribute>) {
+    pub fn with_vertex_attributes(self, attribs: Vec<VertexAttribute>) -> Self {
         let stride = attribs.iter().map(|a| a.count).sum::<i32>() * size_of::<f32>() as i32;
         let mut offset = 0;
 
@@ -55,6 +55,7 @@ impl VertexArray {
             }
         }
         self.unbind();
+        self
     }
 }
 
