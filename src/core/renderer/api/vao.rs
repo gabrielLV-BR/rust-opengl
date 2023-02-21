@@ -36,10 +36,13 @@ impl VertexArray {
 
     pub fn bind_with(&self, objects: Vec<&dyn GLObject>) {
         self.bind();
-        for obj in objects {
+        for obj in objects.iter() {
             obj.bind();
         }
         self.unbind();
+        for obj in objects.iter() {
+            obj.unbind();
+        }
     }
 
     pub fn with_vertex_attributes(self, attribs: Vec<VertexAttribute>) -> Self {

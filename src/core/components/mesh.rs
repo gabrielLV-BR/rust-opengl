@@ -1,7 +1,9 @@
-use gl;
+use bevy_ecs::prelude::Component;
+use gl::{self, DebugMessageCallback};
 
 use crate::core::renderer::api::{buffer::{VertexBuffer, ElementBuffer}, object::GLObject, vao::{VertexArray, VertexAttribute}};
 
+#[derive(Component, Debug)]
 pub struct Mesh {
     vertex_array: VertexArray,
     vertex_buffer: VertexBuffer,
@@ -26,6 +28,10 @@ impl Mesh {
             vertex_buffer,
             element_buffer
         }
+    }
+
+    pub fn element_count(&self) -> usize {
+        self.element_buffer.count()
     }
 }
 

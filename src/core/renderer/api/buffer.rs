@@ -49,7 +49,7 @@ impl<T> Buffer<T> {
         self.data = data;
         self.bind();
 
-        println!("{}", self.size());
+        dbg!(self.size());
 
         unsafe {
             gl::BufferData(

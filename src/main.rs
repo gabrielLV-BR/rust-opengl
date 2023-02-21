@@ -37,12 +37,8 @@ fn main() {
         |s| glfw.get_proc_address_raw(s)
     );
     
-    unsafe {
-        let (width, height) = window.get_size();
-        gl::Viewport(0, 0, width, height);
-    }
-
     // let mut renderer = core::renderer::Renderer::new(&mut glfw, &window);
+    // renderer.setup();
 
     let mut delta = 0f32;
     let mut time = 0f32;
@@ -60,17 +56,14 @@ fn main() {
 
     let vao = VertexArray::new()
         .with_vertex_attributes(vec![VertexAttribute::POSITION]);
-    vao.bind();
 
     let vbo = VertexBuffer::vertex_buffer()
         .with_data(gl::STATIC_DRAW, vertices);
-    vbo.bind();
 
     let ebo = ElementBuffer::element_buffer()
         .with_data(gl::STATIC_DRAW, indices);
-    ebo.bind();
 
-    vao.unbind();
+    vao.bind_with(vec![&vbo, &ebo]);
 
     let vertex_shader = Shader::from_file("assets/shaders/debug.vert", ShaderType::Vertex).unwrap();
     let fragment_shader = Shader::from_file("assets/shaders/debug.frag", ShaderType::Fragment).unwrap();
