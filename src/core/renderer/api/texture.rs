@@ -4,7 +4,7 @@ use image;
 
 use super::object::GLObject;
 
-#[derive(Component)]
+#[derive(Component, Debug)]
 pub struct Texture {
     pub handle: u32,
 }

@@ -6,6 +6,7 @@ use bevy_ecs as bevy;
 use bevy::prelude::*;
 
 use render_stages::*;
+use crate::core::components::material::Material;
 use crate::core::renderer::api::{shader::*, object::GLObject};
 use crate::core::components::mesh::Mesh;
 
@@ -18,15 +19,25 @@ pub struct Renderer {
 pub fn setup_test_object(
     mut commands: Commands
 ) {
-    let vertices = vec![
-        -0.5f32, -0.5, 0.0,
-        0.0, 0.5, 0.0,
-        0.5, -0.5, 0.0
-    ];
+    use tobj::LoadOptions;
+    // let vertices = vec![
+    //     -0.5f32, -0.5, 0.0,
+    //     0.0, 0.5, 0.0,
+    //     0.5, -0.5, 0.0
+    // ];
 
-    let indices: Vec<u32> = vec![
-        0, 1, 2
-    ];
+    // let indices: Vec<u32> = vec![
+    //     0, 1, 2
+    // ];
+
+    let obj = tobj::load_obj(
+        "assets/textures/cabin.obj", 
+    &LoadOptions {
+        ..Default::default()
+    }).unwrap();
+
+    let mesh = Mesh::from(obj.0.as_slice());
+    let material = Material::from(obj.1.unwrap_or(vec![]).as_slice());
 
     let vertex_shader = Shader::from_file(
         "assets/shaders/debug.vert", 
@@ -40,7 +51,7 @@ pub fn setup_test_object(
 
     let program = Program::new(vertex_shader, fragment_shader);
 
-    commands.spawn((Mesh::new(vertices, indices), program));
+    // commands.spawn((Mesh::new(vertices, indices), program));
 }
 
 impl Renderer {

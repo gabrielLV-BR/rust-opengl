@@ -1,11 +1,11 @@
 #version 330 core
 
-in vec3 aColor;
 in vec2 aUV;
 out vec4 outColor;
 
-uniform sampler2D uTexture;
-uniform vec3 uColor;
+uniform sampler2D uDiffuseMap;
+uniform sampler2D uNormalMap;
+uniform vec3 uDiffuseColor;
 
 void main()
 {

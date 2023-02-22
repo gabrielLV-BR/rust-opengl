@@ -53,8 +53,41 @@ impl GLObject for Mesh {
     }
 }
 
-impl From<tobj::Mesh> for Mesh {
-    fn from(value: tobj::Mesh) -> Self {
-        Mesh::new(value.positions, value.indices)
+fn interlace_vecs(positions: Vec<f32>, normals: Vec<f32>, texcoords: Vec<f32>) -> Vec<f32> {
+    let mut new_vertices = Vec::with_capacity(positions.len() + normals.len() + texcoords.len());
+
+    for i in (0..positions.len() / 3) {
+        let pos_index = i * 3;
+        let nor_index = pos_index;
+        let uv_index = i * 2;
+
+        for j in 0..3 {
+            new_vertices.push(positions[pos_index + j]);
+        }
+
+        for j in 0..3 {
+            new_vertices.push(normals[nor_index + j]);
+        }
+
+        for j in 0..2 {
+            new_vertices.push(texcoords[uv_index + j]);
+        }
+    }
+
+    new_vertices
+}
+
+impl From<&[tobj::Model]> for Mesh {
+    fn from(value: &[tobj::Model]) -> Self {
+        // for now, we only care about the first one
+        let mesh = match value.get(0) {
+            Some(model) => model.mesh.to_owned(),
+            None => tobj::Mesh::default()
+        };
+
+        Self::new(
+            interlace_vecs(mesh.positions, mesh.normals, mesh.texcoords), 
+            mesh.indices
+        )
     }
 }
