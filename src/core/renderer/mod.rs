@@ -30,14 +30,15 @@ pub fn setup_test_object(
     //     0, 1, 2
     // ];
 
-    let obj = tobj::load_obj(
+    let (models, materials) = tobj::load_obj(
         "assets/textures/cabin.obj", 
     &LoadOptions {
+        single_index: true,
         ..Default::default()
     }).unwrap();
 
-    let mesh = Mesh::from(obj.0.as_slice());
-    let material = Material::from(obj.1.unwrap_or(vec![]).as_slice());
+    let mesh = Mesh::from(models.as_slice());
+    let material = Material::from(materials.unwrap_or(vec![]).as_slice());
 
     let vertex_shader = Shader::from_file(
         "assets/shaders/debug.vert", 
@@ -51,6 +52,7 @@ pub fn setup_test_object(
 
     let program = Program::new(vertex_shader, fragment_shader);
 
+    commands.spawn((mesh, program));
     // commands.spawn((Mesh::new(vertices, indices), program));
 }
 
@@ -102,10 +104,15 @@ impl Renderer {
     pub fn render(
         q: Query<(&Mesh, &Program)>
     ) {
+
+        let model = ultraviolet::Mat4::from_scale(0.1f32);
+
         q.for_each(|(mesh, program)| {
             mesh.bind();
             program.bind();
     
+            program.set_uniform("aModelMatrix", UniformType::Matrix4(&model));
+
             unsafe {
                 gl::DrawElements(
                     gl::TRIANGLES,

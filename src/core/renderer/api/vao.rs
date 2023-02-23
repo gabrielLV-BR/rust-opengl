@@ -11,9 +11,9 @@ pub struct VertexAttribute {
 
 impl VertexAttribute {
     pub const POSITION  : Self = VertexAttribute { count: 3 };
-    pub const _NORMAL    : Self = VertexAttribute { count: 3 };
-    pub const _COLOR     : Self = VertexAttribute { count: 3 };
-    pub const _UV        : Self = VertexAttribute { count: 2 };
+    pub const NORMAL    : Self = VertexAttribute { count: 3 };
+    pub const COLOR     : Self = VertexAttribute { count: 3 };
+    pub const UV        : Self = VertexAttribute { count: 2 };
 }
 
 #[derive(Component, Debug)]

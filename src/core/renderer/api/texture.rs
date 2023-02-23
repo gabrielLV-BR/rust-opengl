@@ -48,6 +48,11 @@ impl Texture {
             handle,
         }
     }
+
+    pub fn load_from(path: &str) -> Result<Texture, image::ImageError> {
+        let image = image::open(path)?;
+        Ok(Self::new(image))
+    }
 }
 
 impl GLObject for Texture {

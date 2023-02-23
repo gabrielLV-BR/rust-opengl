@@ -48,6 +48,8 @@ impl From<&[tobj::Material]> for Material {
             None => tobj::Material::default()
         };
 
+        println!("{}", material.diffuse_texture);
+
         Material::default()
     }
 }
