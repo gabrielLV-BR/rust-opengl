@@ -1,8 +1,19 @@
-use bevy_ecs::system::Resource;
-use ultraviolet::Vec3;
+use bevy_ecs::prelude::Component;
+use ultraviolet::Mat4;
 
-#[derive(Resource)]
-pub struct Camera {
-    pub position: Vec3,
-    pub direction: Vec3
+#[derive(Component)]
+pub struct Camera {}
+
+impl Camera {
+    pub fn new() -> Self {
+        todo!()
+    }
+
+    pub fn get_perspective_matrix() -> Mat4 {
+        todo!()
+    }
+
+    pub fn get_view_matrix() -> Mat4 {
+        todo!()
+    }
 }

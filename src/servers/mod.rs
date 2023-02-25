@@ -1,4 +1,5 @@
 pub mod mesh_server;
+pub mod program_server;
 
 pub trait AssetServer<T> {
     type Handle;

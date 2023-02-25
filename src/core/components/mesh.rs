@@ -24,8 +24,8 @@ impl Mesh {
             .bound_with(vec![&vertex_buffer, &element_buffer])
             .with_vertex_attributes(vec![
                 VertexAttribute::POSITION, 
-                VertexAttribute::NORMAL,
-                VertexAttribute::UV])
+                /* VertexAttribute::NORMAL,
+                VertexAttribute::UV */])
             .unbound();
 
         Mesh {

@@ -17,7 +17,7 @@ impl Transform {
         }
     }
 
-    pub fn get_matrix(&self) -> Mat4 {
+    pub fn get_model_matrix(&self) -> Mat4 {
         todo!()
     }
 }

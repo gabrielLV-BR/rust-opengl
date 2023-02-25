@@ -2,7 +2,7 @@ use std::{collections::HashMap, io};
 use bevy_ecs::prelude::Component;
 use gl::{self, types::GLchar};
 
-use crate::core::renderer::api::object::GLObject;
+use crate::core::{renderer::api::object::GLObject, components::material::MaterialShaderType};
 
 pub enum ShaderType {
     Vertex,
@@ -84,6 +84,7 @@ impl Drop for Shader {
 #[derive(Component, Debug)]
 pub struct Program {
     handle: u32,
+    material_type: MaterialShaderType,
     uniform_cache: HashMap<String, i32>
 }
 
@@ -96,7 +97,7 @@ pub enum UniformType<'a> {
 }
 
 impl Program {
-    pub fn new(vertex_shader: Shader, fragment_shader: Shader) -> Self {        
+    pub fn new(material_type: MaterialShaderType, vertex_shader: Shader, fragment_shader: Shader) -> Self {        
         let handle = unsafe {
             let handle = gl::CreateProgram();
 
@@ -114,8 +115,13 @@ impl Program {
 
         Self {
             handle,
+            material_type,
             uniform_cache: HashMap::new()
         }
+    }
+
+    pub fn material_type(&self) -> MaterialShaderType {
+        self.material_type
     }
 
     fn map_uniforms(handle: u32) -> HashMap<String, i32> {

@@ -6,9 +6,12 @@ use bevy_ecs as bevy;
 use bevy::prelude::*;
 
 use render_stages::*;
-use crate::core::components::material::Material;
+use ultraviolet::Vec3;
+use crate::core::components::material::BasicMaterial;
 use crate::core::renderer::api::{shader::*, object::GLObject};
 use crate::core::components::mesh::Mesh;
+use crate::servers::AssetServer;
+use crate::servers::program_server::ProgramServer;
 
 pub struct Renderer {
     world: bevy::world::World,
@@ -20,6 +23,7 @@ pub fn setup_test_object(
     mut commands: Commands
 ) {
     use tobj::LoadOptions;
+
     // let vertices = vec![
     //     -0.5f32, -0.5, 0.0,
     //     0.0, 0.5, 0.0,
@@ -30,29 +34,17 @@ pub fn setup_test_object(
     //     0, 1, 2
     // ];
 
-    let (models, materials) = tobj::load_obj(
+    let (models, _) = tobj::load_obj(
         "assets/textures/cabin.obj", 
-    &LoadOptions {
-        single_index: true,
-        ..Default::default()
-    }).unwrap();
+        &LoadOptions { 
+            single_index: true, 
+            ..Default::default() 
+        }
+    ).unwrap();
 
     let mesh = Mesh::from(models.as_slice());
-    let material = Material::from(materials.unwrap_or(vec![]).as_slice());
 
-    let vertex_shader = Shader::from_file(
-        "assets/shaders/debug.vert", 
-        ShaderType::Vertex
-    ).unwrap();
-
-    let fragment_shader = Shader::from_file(
-        "assets/shaders/debug.frag", 
-        ShaderType::Fragment
-    ).unwrap();
-
-    let program = Program::new(vertex_shader, fragment_shader);
-
-    commands.spawn((mesh, program));
+    commands.spawn((mesh, BasicMaterial::new(Vec3::new(0.0, 1.0, 0.0))));
     // commands.spawn((Mesh::new(vertices, indices), program));
 }
 
@@ -86,8 +78,10 @@ impl Renderer {
         self.update_schedule.add_stage(RenderStage, SystemStage::single_threaded());
         self.update_schedule.add_stage(CleanupStage, SystemStage::parallel());
     
+        self.world.insert_resource(ProgramServer::new());
+
         self.init_schedule.add_system_to_stage(InitStage, setup_test_object);
-        self.update_schedule.add_system_to_stage(RenderStage, Self::render);
+        self.update_schedule.add_system_to_stage(RenderStage, render_basic_material);
 
         self.init_schedule.run_once(&mut self.world);
     }
@@ -101,33 +95,37 @@ impl Renderer {
         self.update_schedule.run_once(&mut self.world);
     }
 
-    pub fn render(
-        q: Query<(&Mesh, &Program)>
-    ) {
-
-        let model = ultraviolet::Mat4::from_scale(0.1f32);
-
-        q.for_each(|(mesh, program)| {
-            mesh.bind();
-            program.bind();
-    
-            program.set_uniform("aModelMatrix", UniformType::Matrix4(&model));
-
-            unsafe {
-                gl::DrawElements(
-                    gl::TRIANGLES,
-                    mesh.elements().count() as i32,
-                    gl::UNSIGNED_INT,
-                    std::ptr::null()
-                );
-            }
-
-            mesh.unbind();
-            program.unbind();
-        });
-    }
-
     pub fn dispose(self) {
         todo!()
     }
+}
+
+fn render_basic_material(
+    program_server: Res<ProgramServer>,
+    q: Query<(&Mesh, &BasicMaterial, /* &Transform */)>,
+    // u: Query<&Camera>
+) {
+
+    q.for_each(|(mesh, material)| {
+        let program = program_server.get(material.material_type).expect("Could not find material's shader");
+
+        //TODO: set MVP matrix uniform from Transform and Camera component
+        // program.set_uniform("aModelMatrix", UniformType::Matrix4(&model));
+        program.bind();
+        program.set_uniform("uColor", UniformType::Vec3(&material.color));
+
+        mesh.bind();
+
+        unsafe {
+            gl::DrawElements(
+                gl::TRIANGLES,
+                mesh.elements().count() as i32,
+                gl::UNSIGNED_INT,
+                std::ptr::null()
+            );
+        }
+
+        mesh.unbind();
+        program.unbind();
+    });
 }
