@@ -6,7 +6,7 @@ use super::object::GLObject;
 
 #[derive(Component, Debug)]
 pub struct Texture {
-    pub handle: u32,
+    handle: u32,
 }
 
 impl Texture {

@@ -24,8 +24,7 @@ impl Mesh {
             .bound_with(vec![&vertex_buffer, &element_buffer])
             .with_vertex_attributes(vec![
                 VertexAttribute::POSITION, 
-                /* VertexAttribute::NORMAL,
-                VertexAttribute::UV */])
+                VertexAttribute::UV ])
             .unbound();
 
         Mesh {
@@ -111,9 +110,9 @@ impl From<&[tobj::Model]> for Mesh {
             None => tobj::Mesh::default()
         };
 
-        // println!("Normals");
+        //TODO check if we can disable single_index and handle collecting ourselves
+
         // let normals = index_collect(mesh.normals, mesh.normal_indices, 3);
-        // println!("Texcoordss");
         // let texcoords = index_collect(mesh.texcoords, mesh.texcoord_indices, 2);
 
         let normals = mesh.normals;

@@ -24,9 +24,17 @@ impl ProgramServer {
             Shader::from_file("assets/shaders/basic.frag", Fragment).unwrap(),
         );
 
+        let texture_program = Program::new(
+            MaterialShaderType::TexturedMaterialShader,
+            Shader::from_file("assets/shaders/textured.vert", Vertex).unwrap(),
+            Shader::from_file("assets/shaders/textured.frag", Fragment).unwrap(),
+        );
+            
+
         let mut program_server = ProgramServer { map: HashMap::new() };
 
         program_server.store(basic_program);
+        program_server.store(texture_program);
 
         program_server
     }

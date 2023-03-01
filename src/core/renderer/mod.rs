@@ -6,8 +6,7 @@ use bevy_ecs as bevy;
 use bevy::prelude::*;
 
 use render_stages::*;
-use ultraviolet::Vec3;
-use crate::core::components::material::BasicMaterial;
+use crate::core::components::material::{BasicMaterial, TexturedMaterial};
 use crate::core::renderer::api::{shader::*, object::GLObject};
 use crate::core::components::mesh::Mesh;
 use crate::servers::AssetServer;
@@ -22,30 +21,23 @@ pub struct Renderer {
 pub fn setup_test_object(
     mut commands: Commands
 ) {
-    use tobj::LoadOptions;
+    let vertices: Vec<f32> = vec![
+        -0.5, -0.5, 0.0, 0.0, 0.0,
+        -0.5,  0.5, 0.0, 0.0, 1.0,
+         0.5,  0.5, 0.0, 1.0, 1.0,
+         0.5, -0.5, 0.0, 1.0, 0.0,
+    ];
 
-    // let vertices = vec![
-    //     -0.5f32, -0.5, 0.0,
-    //     0.0, 0.5, 0.0,
-    //     0.5, -0.5, 0.0
-    // ];
+    let indices: Vec<u32> = vec![
+        0, 1, 2,
+        2, 3, 0,
+    ];
 
-    // let indices: Vec<u32> = vec![
-    //     0, 1, 2
-    // ];
+    let mesh = Mesh::new(vertices, indices);
+    let texture = api::texture::Texture::load_from("assets/textures/tile.png")
+        .expect("Error loading texture");
 
-    let (models, _) = tobj::load_obj(
-        "assets/textures/cabin.obj", 
-        &LoadOptions { 
-            single_index: true, 
-            ..Default::default() 
-        }
-    ).unwrap();
-
-    let mesh = Mesh::from(models.as_slice());
-
-    commands.spawn((mesh, BasicMaterial::new(Vec3::new(0.0, 1.0, 0.0))));
-    // commands.spawn((Mesh::new(vertices, indices), program));
+    commands.spawn((mesh, TexturedMaterial::new(texture)));
 }
 
 impl Renderer {
@@ -102,7 +94,7 @@ impl Renderer {
 
 fn render_basic_material(
     program_server: Res<ProgramServer>,
-    q: Query<(&Mesh, &BasicMaterial, /* &Transform */)>,
+    q: Query<(&Mesh, &TexturedMaterial, /* &Transform */)>,
     // u: Query<&Camera>
 ) {
 
@@ -112,7 +104,9 @@ fn render_basic_material(
         //TODO: set MVP matrix uniform from Transform and Camera component
         // program.set_uniform("aModelMatrix", UniformType::Matrix4(&model));
         program.bind();
-        program.set_uniform("uColor", UniformType::Vec3(&material.color));
+        material.texture.bind();
+
+        program.set_uniform("uTexture", UniformType::Int(0));
 
         mesh.bind();
 
