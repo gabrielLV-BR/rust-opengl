@@ -3,11 +3,11 @@
 layout(location=0) in vec3 inPos;
 layout(location=1) in vec2 inUV;
 
-// uniform mat4 aModelMatrix;
+uniform mat4 uModelMatrix;
 
 out vec2 aUV;
 
 void main() {
-    gl_Position = vec4(inPos, 1.0);
+    gl_Position = uModelMatrix * vec4(inPos, 1.0);
     aUV = inUV;
 }

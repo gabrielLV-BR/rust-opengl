@@ -7,6 +7,8 @@ use bevy::prelude::*;
 
 use render_stages::*;
 use crate::core::components::material::{BasicMaterial, TexturedMaterial};
+use crate::core::components::vertex::Vertex;
+use crate::core::renderer::api::vao::VertexAttribute;
 use crate::core::renderer::api::{shader::*, object::GLObject};
 use crate::core::components::mesh::{Mesh, MeshBuilder};
 use crate::servers::AssetServer;
@@ -22,20 +24,42 @@ pub fn setup_test_object(
     mut commands: Commands
 ) {
     use tobj::LoadOptions;
+    use ultraviolet::{Vec3, Vec2};
 
     let (models, _) = tobj::load_obj("assets/cube.obj", &LoadOptions {
-        single_index: true,
+        triangulate: true,
         ..Default::default()
     }).unwrap();
 
-    let model_mesh = models.get(0).unwrap().mesh.clone();
+    let mut vertices : Vec<Vertex> = vec![];
+    let mut indices  : Vec<u32>    = vec![];
 
-    let mesh = MeshBuilder::new()
-        .with_positions(model_mesh.positions)
-        .with_normals(model_mesh.normals)
-        .with_uv(model_mesh.texcoords)
-        .with_indices(model_mesh.indices)
-        .build();
+
+    for model in &models {
+        for index in &model.mesh.indices {
+            let vertex = Vertex {
+                position: Vec3::zero(),
+                normal: Vec3::zero(),
+                uv: Vec2::zero(),
+            };
+
+            vertices.push(vertex);
+            indices.push(indices.len() as u32);
+        }
+    }
+
+    let mesh = Mesh::new(vertices, indices, vec![
+        VertexAttribute::POSITION,
+        VertexAttribute::NORMAL,
+        VertexAttribute::UV,
+    ]);
+
+    // let mesh = MeshBuilder::new()
+    //     .with_positions(model_mesh.positions)
+    //     .with_normals(model_mesh.normals)
+    //     .with_uv(model_mesh.texcoords)
+    //     .with_indices(model_mesh.indices)
+    //     .build();
 
     let texture = api::texture::Texture::load_from("assets/textures/tile.png")
         .expect("Error loading texture");
@@ -101,14 +125,16 @@ fn render_basic_material(
     // u: Query<&Camera>
 ) {
 
+    let model = ultraviolet::Mat4::from_scale(0.2);
+
     q.for_each(|(mesh, material)| {
         let program = program_server.get(material.material_type).expect("Could not find material's shader");
 
         //TODO: set MVP matrix uniform from Transform and Camera component
-        // program.set_uniform("aModelMatrix", UniformType::Matrix4(&model));
         program.bind();
         material.texture.bind();
-
+        
+        program.set_uniform("uModelMatrix", UniformType::Matrix4(&model));
         program.set_uniform("uTexture", UniformType::Int(0));
 
         mesh.bind();

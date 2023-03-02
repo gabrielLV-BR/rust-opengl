@@ -1,3 +1,5 @@
+use crate::core::components::vertex::Vertex;
+
 use super::object::GLObject;
 use bevy_ecs::prelude::Component;
 use gl;
@@ -10,7 +12,7 @@ pub struct Buffer<T> {
     pub data: Vec<T>
 }
 
-pub type VertexBuffer = Buffer<f32>;
+pub type VertexBuffer = Buffer<Vertex>;
 pub type ElementBuffer = Buffer<u32>;
 
 impl<T> Buffer<T> {
@@ -29,7 +31,7 @@ impl<T> Buffer<T> {
         }
     }
 
-    pub fn vertex_buffer() -> Buffer<f32> {
+    pub fn vertex_buffer() -> Buffer<Vertex> {
         VertexBuffer::new(gl::ARRAY_BUFFER)
     }
 
