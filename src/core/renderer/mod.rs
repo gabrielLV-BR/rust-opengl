@@ -8,7 +8,7 @@ use bevy::prelude::*;
 use render_stages::*;
 use crate::core::components::material::{BasicMaterial, TexturedMaterial};
 use crate::core::renderer::api::{shader::*, object::GLObject};
-use crate::core::components::mesh::Mesh;
+use crate::core::components::mesh::{Mesh, MeshBuilder};
 use crate::servers::AssetServer;
 use crate::servers::program_server::ProgramServer;
 
@@ -21,19 +21,22 @@ pub struct Renderer {
 pub fn setup_test_object(
     mut commands: Commands
 ) {
-    let vertices: Vec<f32> = vec![
-        -0.5, -0.5, 0.0, 0.0, 0.0,
-        -0.5,  0.5, 0.0, 0.0, 1.0,
-         0.5,  0.5, 0.0, 1.0, 1.0,
-         0.5, -0.5, 0.0, 1.0, 0.0,
-    ];
+    use tobj::LoadOptions;
 
-    let indices: Vec<u32> = vec![
-        0, 1, 2,
-        2, 3, 0,
-    ];
+    let (models, _) = tobj::load_obj("assets/cube.obj", &LoadOptions {
+        single_index: true,
+        ..Default::default()
+    }).unwrap();
 
-    let mesh = Mesh::new(vertices, indices);
+    let model_mesh = models.get(0).unwrap().mesh.clone();
+
+    let mesh = MeshBuilder::new()
+        .with_positions(model_mesh.positions)
+        .with_normals(model_mesh.normals)
+        .with_uv(model_mesh.texcoords)
+        .with_indices(model_mesh.indices)
+        .build();
+
     let texture = api::texture::Texture::load_from("assets/textures/tile.png")
         .expect("Error loading texture");
 

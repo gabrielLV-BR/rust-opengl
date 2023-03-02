@@ -1,5 +1,3 @@
-use std::ops::Index;
-
 use bevy_ecs::prelude::Component;
 
 use crate::core::renderer::api::{buffer::{VertexBuffer, ElementBuffer}, object::GLObject, vao::{VertexArray, VertexAttribute}};
@@ -12,7 +10,7 @@ pub struct Mesh {
 }
 
 impl Mesh {
-    pub fn new(vertices: Vec<f32>, indices: Vec<u32>) -> Self {
+    pub fn new(vertices: Vec<f32>, indices: Vec<u32>, vertex_attributes: Vec<VertexAttribute>) -> Self {
 
         let vertex_buffer = VertexBuffer::vertex_buffer()
             .with_data(gl::STATIC_DRAW, vertices);
@@ -22,9 +20,7 @@ impl Mesh {
 
         let vertex_array = VertexArray::new()
             .bound_with(vec![&vertex_buffer, &element_buffer])
-            .with_vertex_attributes(vec![
-                VertexAttribute::POSITION, 
-                VertexAttribute::UV ])
+            .with_vertex_attributes(vertex_attributes)
             .unbound();
 
         Mesh {
@@ -59,26 +55,28 @@ impl GLObject for Mesh {
 
 fn interlace_vecs(positions: Vec<f32>, normals: Vec<f32>, texcoords: Vec<f32>) -> Vec<f32> {
 
-    println!("{}", positions.len());
-    println!("{}", normals.len());
     assert!(positions.len() == normals.len());
 
     let mut new_vertices = Vec::with_capacity(positions.len() + normals.len() + texcoords.len());
+
+    let vertex_count = if positions.len() > 0 { 3 } else { 0 };
+    let normal_count = if normals.len()   > 0 { 3 } else { 0 };
+    let uv_count     = if texcoords.len() > 0 { 2 } else { 0 };
 
     for i in 0..(positions.len() / 3 - 1) {
         let pos_index = i * 3;
         let nor_index = pos_index;
         let uv_index = i * 2;
 
-        for j in 0..3 {
+        for j in 0..vertex_count {
             new_vertices.push(positions[pos_index + j]);
         }
 
-        for j in 0..2 {
+        for j in 0..normal_count {
             new_vertices.push(normals[nor_index + j]);
         }
 
-        for j in 0..2 {
+        for j in 0..uv_count {
             new_vertices.push(texcoords[uv_index + j]);
         }
     }
@@ -87,40 +85,76 @@ fn interlace_vecs(positions: Vec<f32>, normals: Vec<f32>, texcoords: Vec<f32>) -
 }
 
 
-fn index_collect(arr: Vec<f32>, indexes: Vec<u32>, index_count: usize) -> Vec<f32> {
-    println!("Arr: {}\nIndexes: {}", arr.len(), indexes.len());
+pub struct MeshBuilder {
+    positions: Option<Vec<f32>>,
+    indices: Option<Vec<u32>>,
+    normals: Option<Vec<f32>>,
+    uv: Option<Vec<f32>>,
+    attributes: Vec<VertexAttribute>
+}
 
-    let mut collected: Vec<f32> = Vec::new();
-
-    for i in (0..indexes.len() - 1).step_by(3) {
-        for j in 0..index_count {
-            println!("collected.push(arr[indexes[{}] as usize]);", i + j);
-            collected.push(arr[indexes[i + j] as usize]);
+impl MeshBuilder {
+    pub fn new() -> Self {
+        MeshBuilder { 
+            positions: None, 
+            indices: None, 
+            normals: None, 
+            uv: None,
+            attributes: Vec::new()
         }
     }
 
-    collected
-}
+    pub fn build(self) -> Mesh {
+        let positions= self.positions.unwrap_or(vec![]);
+        let indices  = self.indices.unwrap_or(vec![]);
+        let normals  = self.normals.unwrap_or(vec![]);
+        let uv       = self.uv.unwrap_or(vec![]);
 
-impl From<&[tobj::Model]> for Mesh {
-    fn from(value: &[tobj::Model]) -> Self {
-        // for now, we only care about the first one
-        let mesh = match value.get(0) {
-            Some(model) => model.mesh.to_owned(),
-            None => tobj::Mesh::default()
-        };
+        let vertices = interlace_vecs(positions, normals, uv);
 
-        //TODO check if we can disable single_index and handle collecting ourselves
+        let mut attributes = self.attributes;
+        attributes.sort_by_key(|a| a.order);
 
-        // let normals = index_collect(mesh.normals, mesh.normal_indices, 3);
-        // let texcoords = index_collect(mesh.texcoords, mesh.texcoord_indices, 2);
+        Mesh::new(vertices, indices, attributes)
+    }
 
-        let normals = mesh.normals;
-        let texcoords = mesh.texcoords;
+    pub fn with_positions(self, positions: Vec<f32>) -> MeshBuilder {
+        let mut attributes = self.attributes;
+        attributes.push(VertexAttribute::POSITION);
+        
+        Self {
+            positions: Some(positions),
+            attributes,
+            ..self
+        }
+    }
 
-        Self::new(
-            interlace_vecs(mesh.positions, normals, texcoords), 
-            mesh.indices
-        )
+    pub fn with_indices(self, indices: Vec<u32>) -> MeshBuilder {
+        Self {
+            indices: Some(indices),
+            ..self
+        }
+    }
+
+    pub fn with_normals(self, normals: Vec<f32>) -> MeshBuilder {
+        let mut attributes = self.attributes;
+        attributes.push(VertexAttribute::NORMAL);
+
+        Self {
+            normals: Some(normals),
+            attributes,
+            ..self
+        }
+    }
+
+    pub fn with_uv(self, uv: Vec<f32>) -> MeshBuilder {
+        let mut attributes = self.attributes;
+        attributes.push(VertexAttribute::UV);
+
+        Self {
+            uv: Some(uv),
+            attributes,
+            ..self
+        }
     }
 }
