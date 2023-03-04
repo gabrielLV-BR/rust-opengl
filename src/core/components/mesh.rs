@@ -1,10 +1,8 @@
 use bevy_ecs::prelude::Component;
-use ultraviolet::{Vec2, Vec3};
 
-use crate::core::renderer::api::{buffer::{VertexBuffer, ElementBuffer}, object::GLObject, vao::{VertexArray, VertexAttribute}};
+use crate::core::renderer::api::{buffer::{VertexBuffer, ElementBuffer}, object::GLObject, vao::{VertexArray, VertexAttribute}, vertex::Vertex};
 
-use super::vertex::Vertex;
-
+#[allow(dead_code)]
 #[derive(Component, Debug)]
 pub struct Mesh {
     vertex_array: VertexArray,
@@ -33,7 +31,7 @@ impl Mesh {
         }
     }
 
-    pub fn vertices(&self) -> &VertexBuffer {
+    pub fn _vertices(&self) -> &VertexBuffer {
         &self.vertex_buffer
     }
 
@@ -56,11 +54,10 @@ impl GLObject for Mesh {
     }
 }
 
-fn interlace_vecs(positions: Vec<f32>, normals: Vec<f32>, texcoords: Vec<f32>) -> Vec<Vertex> {
-
+fn _interlace_vecs(positions: Vec<f32>, normals: Vec<f32>, texcoords: Vec<f32>) -> Vec<Vertex> {
     assert!(positions.len() == normals.len());
 
-    let mut new_vertices: Vec<Vertex> = Vec::with_capacity(positions.len());
+    let new_vertices: Vec<Vertex> = Vec::with_capacity(positions.len());
 
     let vertex_count = if positions.len() > 0 { 3 } else { 0 };
     let normal_count = if normals.len()   > 0 { 3 } else { 0 };
@@ -86,90 +83,7 @@ fn interlace_vecs(positions: Vec<f32>, normals: Vec<f32>, texcoords: Vec<f32>) -
         for j in 0..uv_count {
             u.push(texcoords[uv_index + j]);
         }
-
-        let vertex = Vertex {
-            position: Vec3::new(v[0], v[1], v[2]),
-            normal: Vec3::new(n[0], n[1], n[2]),
-            uv: Vec2::new(u[0], u[1])
-        };
     }
 
     new_vertices
-}
-
-
-pub struct MeshBuilder {
-    vertices: Option<Vec<Vertex>>,
-    positions: Option<Vec<f32>>,
-    indices: Option<Vec<u32>>,
-    normals: Option<Vec<f32>>,
-    uv: Option<Vec<f32>>,
-    attributes: Vec<VertexAttribute>
-}
-
-impl MeshBuilder {
-    pub fn new() -> Self {
-        MeshBuilder { 
-            vertices: None,
-            positions: None, 
-            indices: None, 
-            normals: None, 
-            uv: None,
-            attributes: Vec::new()
-        }
-    }
-
-    pub fn build(self) -> Mesh {
-        let positions= self.positions.unwrap_or(vec![]);
-        let indices  = self.indices.unwrap_or(vec![]);
-        let normals  = self.normals.unwrap_or(vec![]);
-        let uv       = self.uv.unwrap_or(vec![]);
-
-        let vertices = self.vertices.unwrap_or(interlace_vecs(positions, normals, uv));
-
-        let mut attributes = self.attributes;
-        attributes.sort_by_key(|a| a.order);
-
-        Mesh::new(vertices, indices, attributes)
-    }
-
-    pub fn with_positions(self, positions: Vec<f32>) -> MeshBuilder {
-        let mut attributes = self.attributes;
-        attributes.push(VertexAttribute::POSITION);
-        
-        Self {
-            positions: Some(positions),
-            attributes,
-            ..self
-        }
-    }
-
-    pub fn with_indices(self, indices: Vec<u32>) -> MeshBuilder {
-        Self {
-            indices: Some(indices),
-            ..self
-        }
-    }
-
-    pub fn with_normals(self, normals: Vec<f32>) -> MeshBuilder {
-        let mut attributes = self.attributes;
-        attributes.push(VertexAttribute::NORMAL);
-
-        Self {
-            normals: Some(normals),
-            attributes,
-            ..self
-        }
-    }
-
-    pub fn with_uv(self, uv: Vec<f32>) -> MeshBuilder {
-        let mut attributes = self.attributes;
-        attributes.push(VertexAttribute::UV);
-
-        Self {
-            uv: Some(uv),
-            attributes,
-            ..self
-        }
-    }
 }

@@ -4,7 +4,7 @@ pub mod camera;
 pub mod mesh;
 pub mod transform;
 pub mod material;
-pub mod vertex;
+pub mod model;
 
 #[derive(PartialEq, Debug)]
 pub struct Color {

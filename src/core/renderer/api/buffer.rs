@@ -1,6 +1,4 @@
-use crate::core::components::vertex::Vertex;
-
-use super::object::GLObject;
+use super::{object::GLObject, vertex::Vertex};
 use bevy_ecs::prelude::Component;
 use gl;
 use std::mem::size_of;
