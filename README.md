@@ -25,7 +25,6 @@ Just check that you have every `glfw` dependency installed and `cargo run`.
 
 * [Rust](https://www.rust-lang.org) - Language
 * OpenGL ([gl](https://docs.rs/gl/latest/gl/) and [glfw](https://docs.rs/glfw/latest/glfw/) crate) - Graphics API
-* [Bevy ECS](https://docs.rs/bevy_ecs/latest/bevy_ecs/) - ECS frameworks
 * [tobj](https://docs.rs/tobj/latest/tobj/) - OBJ loading
 * [ultraviolet](https://docs.rs/ultraviolet/latest/ultraviolet/) - 3D math library
 * [image](https://docs.rs/image/latest/image) - Image loading
