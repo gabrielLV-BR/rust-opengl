@@ -1,7 +1,5 @@
-use bevy_ecs::prelude::Component;
 use ultraviolet::Mat4;
 
-#[derive(Component)]
 pub struct Camera {}
 
 impl Camera {

@@ -1,9 +1,11 @@
-use bevy_ecs::prelude::Component;
-
-use crate::core::renderer::api::{buffer::{VertexBuffer, ElementBuffer}, object::GLObject, vao::{VertexArray, VertexAttribute}, vertex::Vertex};
+use crate::core::renderer::api::{
+    buffer::{VertexBuffer, ElementBuffer}, 
+    object::GLObject, 
+    vao::{VertexArray, VertexAttribute}, 
+    vertex::Vertex
+};
 
 #[allow(dead_code)]
-#[derive(Component, Debug)]
 pub struct Mesh {
     vertex_array: VertexArray,
     vertex_buffer: VertexBuffer,

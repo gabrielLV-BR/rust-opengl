@@ -31,7 +31,6 @@ fn main() {
     );
     
     let mut renderer = core::renderer::Renderer::new(&mut glfw, &window);
-    renderer.setup();
 
     let mut delta: f32;
     let mut time: f32;
@@ -40,8 +39,6 @@ fn main() {
     while !window.should_close() {
         time = glfw.get_time() as f32;
         delta = time - last_time;
-
-        renderer.update(delta);
 
         glfw.poll_events();
         window.swap_buffers();

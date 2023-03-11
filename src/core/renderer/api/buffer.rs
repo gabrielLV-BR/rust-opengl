@@ -1,9 +1,8 @@
 use super::{object::GLObject, vertex::Vertex};
-use bevy_ecs::prelude::Component;
 use gl;
 use std::mem::size_of;
 
-#[derive(Component, Debug)]
+#[derive(Debug)]
 pub struct Buffer<T> {
     pub handle: u32,
     target: u32,

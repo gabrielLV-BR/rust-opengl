@@ -1,11 +1,9 @@
-use bevy_ecs::prelude::Component;
 use ultraviolet::{Vec3, Vec2};
 
 use crate::core::renderer::api::{vertex::Vertex, vao::VertexAttribute};
 
 use super::mesh::Mesh;
 
-#[derive(Component)]
 pub struct Model {
     pub meshes: Vec<Mesh>,
 }

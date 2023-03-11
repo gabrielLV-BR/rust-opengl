@@ -1,7 +1,5 @@
-use bevy_ecs::prelude::Component;
 use ultraviolet::{Vec3, Rotor3, Mat4};
 
-#[derive(Component)]
 pub struct Transform {
     pub translation: Vec3,
     pub scale: Vec3,

@@ -1,10 +1,6 @@
 use std::hash::Hash;
 
-pub mod camera;
-pub mod mesh;
 pub mod transform;
-pub mod material;
-pub mod model;
 
 #[derive(PartialEq, Debug)]
 pub struct Color {

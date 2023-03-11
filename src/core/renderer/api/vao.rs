@@ -1,5 +1,4 @@
 use super::object::GLObject;
-use bevy_ecs::prelude::Component;
 use gl::types::*;
 use std::mem::size_of;
 
@@ -17,7 +16,7 @@ impl VertexAttribute {
     pub const UV        : Self = VertexAttribute { count: 2, order: 3 };
 }
 
-#[derive(Component, Debug)]
+#[derive(Debug)]
 pub struct VertexArray {
     handle: u32,
 }
