@@ -1,7 +1,7 @@
 use std::{collections::HashMap, io};
 use gl::{self, types::GLchar};
 
-use crate::core::renderer::api::object::GLObject;
+use super::object::GLObject;
 
 pub enum ShaderType {
     Vertex,

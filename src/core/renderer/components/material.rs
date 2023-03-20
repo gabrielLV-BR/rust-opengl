@@ -1,6 +1,10 @@
 use ultraviolet::Vec3;
 
-use crate::core::renderer::api::texture::Texture;
+use crate::core::renderer::backend::gl::texture::Texture;
+
+pub trait MaterialTrait {
+    fn prepare(&self);
+}
 
 pub enum MaterialShaderType {
     BasicMaterialShader,

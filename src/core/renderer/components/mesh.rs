@@ -1,4 +1,4 @@
-use crate::core::renderer::api::{
+use crate::core::renderer::backend::gl::{
     buffer::{VertexBuffer, ElementBuffer}, 
     object::GLObject, 
     vao::{VertexArray, VertexAttribute}, 
