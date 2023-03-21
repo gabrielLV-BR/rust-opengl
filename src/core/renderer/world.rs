@@ -1,6 +1,6 @@
 use crate::core::components::transform::Transform;
 
-use super::components::{mesh::Mesh, material::MaterialTrait};
+use super::components::{material::MaterialTrait, mesh::Mesh};
 
 pub struct RenderWorld {
     meshes: Vec<Mesh>,
@@ -10,13 +10,13 @@ pub struct RenderWorld {
 
 impl RenderWorld {
     pub fn new() -> Self {
-        RenderWorld { 
-            meshes: vec![], 
-            materials: vec![], 
-            children: vec![]
+        RenderWorld {
+            meshes: vec![],
+            materials: vec![],
+            children: vec![],
         }
     }
-    
+
     pub fn nodes(&self) -> &Vec<RenderNode> {
         &self.children
     }
@@ -54,10 +54,10 @@ pub struct RenderNode {
 
 impl RenderNode {
     pub fn new() -> Self {
-        RenderNode { 
-            mesh_handle: None, 
-            material_handle: None, 
-            transform: Transform::identity()
+        RenderNode {
+            mesh_handle: None,
+            material_handle: None,
+            transform: Transform::identity(),
         }
     }
 
@@ -76,11 +76,11 @@ impl RenderNode {
 
 impl Default for RenderNode {
     fn default() -> Self {
-        RenderNode { 
-            mesh_handle: None, 
+        RenderNode {
+            mesh_handle: None,
             material_handle: None,
             transform: Transform::identity(),
             // children: None,
-        }      
+        }
     }
 }

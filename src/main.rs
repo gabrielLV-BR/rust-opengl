@@ -4,6 +4,8 @@ mod servers;
 use glfw::{self, Context};
 use std::time::Duration;
 
+use crate::core::renderer::RenderWorld;
+
 fn main() {
     const WIDTH: i32 = 500;
     const HEIGHT: i32 = 500;
@@ -13,12 +15,19 @@ fn main() {
     let mut glfw = glfw::init(glfw::FAIL_ON_ERRORS).unwrap();
 
     glfw.window_hint(glfw::WindowHint::ContextVersion(4, 1));
-    glfw.window_hint(glfw::WindowHint::OpenGlProfile(glfw::OpenGlProfileHint::Core));
+    glfw.window_hint(glfw::WindowHint::OpenGlProfile(
+        glfw::OpenGlProfileHint::Core,
+    ));
     glfw.window_hint(glfw::WindowHint::OpenGlForwardCompat(true));
     glfw.window_hint(glfw::WindowHint::DoubleBuffer(true));
 
     let (mut window, _) = glfw
-        .create_window(WIDTH as u32, HEIGHT as u32, "Hello", glfw::WindowMode::Windowed)
+        .create_window(
+            WIDTH as u32,
+            HEIGHT as u32,
+            "Hello",
+            glfw::WindowMode::Windowed,
+        )
         .unwrap();
 
     glfw.make_context_current(Some(&window));
@@ -26,11 +35,10 @@ fn main() {
 
     glfw.make_context_current(Some(&window));
 
-    gl::load_with(
-        |s| glfw.get_proc_address_raw(s)
-    );
-    
+    gl::load_with(|s| glfw.get_proc_address_raw(s));
+
     let mut renderer = core::renderer::Renderer::new(&mut glfw, &window);
+    let mut render_world = RenderWorld::new();
 
     let mut delta: f32;
     let mut time: f32;
@@ -40,12 +48,14 @@ fn main() {
         time = glfw.get_time() as f32;
         delta = time - last_time;
 
+        renderer.render(&render_world);
+
         glfw.poll_events();
         window.swap_buffers();
 
         let wait_time = FRAME_DURATION;
         let curr_frame_time = glfw.get_time() as f32 - time;
-        let dur = 1000.0 * ( wait_time - curr_frame_time ) + 0.5;
+        let dur = 1000.0 * (wait_time - curr_frame_time) + 0.5;
 
         if dur > 0f32 {
             std::thread::sleep(Duration::from_millis(dur as u64));

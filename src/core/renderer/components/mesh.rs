@@ -1,25 +1,26 @@
 use crate::core::renderer::backend::gl::{
-    buffer::{VertexBuffer, ElementBuffer}, 
-    object::GLObject, 
-    vao::{VertexArray, VertexAttribute}, 
-    vertex::Vertex
+    buffer::{ElementBuffer, VertexBuffer},
+    object::GLObject,
+    vao::{VertexArray, VertexAttribute},
+    vertex::Vertex,
 };
 
 #[allow(dead_code)]
 pub struct Mesh {
     vertex_array: VertexArray,
     vertex_buffer: VertexBuffer,
-    element_buffer: ElementBuffer
+    element_buffer: ElementBuffer,
 }
 
 impl Mesh {
-    pub fn new(vertices: Vec<Vertex>, indices: Vec<u32>, vertex_attributes: Vec<VertexAttribute>) -> Self {
+    pub fn new(
+        vertices: Vec<Vertex>,
+        indices: Vec<u32>,
+        vertex_attributes: Vec<VertexAttribute>,
+    ) -> Self {
+        let vertex_buffer = VertexBuffer::vertex_buffer().with_data(gl::STATIC_DRAW, vertices);
 
-        let vertex_buffer = VertexBuffer::vertex_buffer()
-            .with_data(gl::STATIC_DRAW, vertices);
-
-        let element_buffer = ElementBuffer::element_buffer()
-            .with_data(gl::STATIC_DRAW, indices);
+        let element_buffer = ElementBuffer::element_buffer().with_data(gl::STATIC_DRAW, indices);
 
         let vertex_array = VertexArray::new()
             .bound_with(vec![&vertex_buffer, &element_buffer])
@@ -29,7 +30,7 @@ impl Mesh {
         Mesh {
             vertex_array,
             vertex_buffer,
-            element_buffer
+            element_buffer,
         }
     }
 
@@ -46,7 +47,7 @@ impl GLObject for Mesh {
     fn bind(&self) {
         self.vertex_array.bind();
     }
-    
+
     fn unbind(&self) {
         self.vertex_array.unbind();
     }
@@ -62,8 +63,8 @@ fn _interlace_vecs(positions: Vec<f32>, normals: Vec<f32>, texcoords: Vec<f32>) 
     let new_vertices: Vec<Vertex> = Vec::with_capacity(positions.len());
 
     let vertex_count = if positions.len() > 0 { 3 } else { 0 };
-    let normal_count = if normals.len()   > 0 { 3 } else { 0 };
-    let uv_count     = if texcoords.len() > 0 { 2 } else { 0 };
+    let normal_count = if normals.len() > 0 { 3 } else { 0 };
+    let uv_count = if texcoords.len() > 0 { 2 } else { 0 };
 
     for i in 0..(positions.len() / 3 - 1) {
         let pos_index = i * 3;
