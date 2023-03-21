@@ -23,6 +23,13 @@ impl Renderer {
     }
 
     pub fn render(&self, render_world: &RenderWorld) {
+
+        for node in render_world.nodes() {
+            if let Some(material_handle) = node.material_handle() {
+                let material = render_world.get_material(material_handle).expect("Invalid material handle");
+                material.prepare();
+            }
+        }
     }
 
     pub fn resize(&mut self, width: i32, height: i32) {
