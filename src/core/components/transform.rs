@@ -18,4 +18,12 @@ impl Transform {
     pub fn get_model_matrix(&self) -> Mat4 {
         todo!()
     }
+
+    pub fn identity() -> Self {
+        Transform { 
+            translation: Vec3::zero(), 
+            scale: Vec3::zero(), 
+            rotation: Rotor3::identity() 
+        }
+    }
 }
