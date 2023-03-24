@@ -1,17 +1,18 @@
-use ultraviolet::{Vec3, Rotor3, Mat4};
+use ultraviolet::{Mat4, Rotor3, Vec3};
 
+#[derive(Debug)]
 pub struct Transform {
     pub translation: Vec3,
     pub scale: Vec3,
-    pub rotation: Rotor3
+    pub rotation: Rotor3,
 }
 
 impl Transform {
     pub fn new() -> Self {
-        Transform { 
-            translation: Vec3::zero(), 
-            scale: Vec3::zero(), 
-            rotation: Rotor3::identity() 
+        Transform {
+            translation: Vec3::zero(),
+            scale: Vec3::zero(),
+            rotation: Rotor3::identity(),
         }
     }
 
@@ -20,10 +21,10 @@ impl Transform {
     }
 
     pub fn identity() -> Self {
-        Transform { 
-            translation: Vec3::zero(), 
-            scale: Vec3::zero(), 
-            rotation: Rotor3::identity() 
+        Transform {
+            translation: Vec3::zero(),
+            scale: Vec3::zero(),
+            rotation: Rotor3::identity(),
         }
     }
 }

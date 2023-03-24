@@ -3,8 +3,16 @@ mod servers;
 
 use glfw::{self, Context};
 use std::time::Duration;
+use ultraviolet::Vec3;
 
-use crate::core::renderer::RenderWorld;
+use crate::core::{
+    components::transform::Transform,
+    renderer::{
+        backend::gl::{vao::VertexAttribute, vertex::Vertex},
+        components::{material::BasicMaterial, mesh::Mesh},
+        RenderNode, RenderWorld,
+    },
+};
 
 fn main() {
     const WIDTH: i32 = 500;
@@ -40,6 +48,18 @@ fn main() {
     let mut renderer = core::renderer::Renderer::new(&mut glfw, &window);
     let mut render_world = RenderWorld::new();
 
+    let vertices = vec![
+        Vertex::position(-0.5, -0.5, 0.0),
+        Vertex::position(0.0, 0.5, 0.0),
+        Vertex::position(0.5, -0.5, 0.0),
+    ];
+    let indices = vec![0u32, 1, 2];
+
+    let mesh = Mesh::new(vertices, indices, vec![VertexAttribute::POSITION]);
+    let basic_material = BasicMaterial::new(Vec3::new(1.0, 0.0, 0.0));
+
+    render_world.add_node_with(mesh, Box::new(basic_material), Transform::identity());
+
     let mut delta: f32;
     let mut time: f32;
     let mut last_time = glfw.get_time() as f32;
@@ -65,7 +85,4 @@ fn main() {
     }
 
     renderer.dispose();
-
-    drop(window);
-    drop(glfw);
 }

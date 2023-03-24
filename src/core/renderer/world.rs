@@ -4,7 +4,7 @@ use super::components::{material::MaterialTrait, mesh::Mesh};
 
 pub struct RenderWorld {
     meshes: Vec<Mesh>,
-    materials: Vec<&'static dyn MaterialTrait>,
+    materials: Vec<Box<dyn MaterialTrait>>,
     children: Vec<RenderNode>,
 }
 
@@ -21,12 +21,21 @@ impl RenderWorld {
         &self.children
     }
 
+    pub fn add_node_with(
+        &mut self,
+        mesh: Mesh,
+        basic_material: Box<dyn MaterialTrait>,
+        transform: Transform,
+    ) {
+        todo!()
+    }
+
     pub fn add_mesh(&mut self, mesh: Mesh) -> usize {
         self.meshes.push(mesh);
         self.meshes.len() - 1
     }
 
-    pub fn add_material(&mut self, material: &'static dyn MaterialTrait) -> usize {
+    pub fn add_material(&mut self, material: Box<dyn MaterialTrait>) -> usize {
         self.materials.push(material);
         self.materials.len() - 1
     }
@@ -36,7 +45,7 @@ impl RenderWorld {
         self.children.len() - 1
     }
 
-    pub fn get_material(&self, handle: usize) -> Option<&&dyn MaterialTrait> {
+    pub fn get_material(&self, handle: usize) -> Option<&Box<dyn MaterialTrait>> {
         self.materials.get(handle)
     }
 
@@ -45,6 +54,7 @@ impl RenderWorld {
     }
 }
 
+#[derive(Debug)]
 pub struct RenderNode {
     mesh_handle: Option<usize>,
     material_handle: Option<usize>,
@@ -58,6 +68,20 @@ impl RenderNode {
             mesh_handle: None,
             material_handle: None,
             transform: Transform::identity(),
+        }
+    }
+
+    pub fn with_mesh(self, mesh_handle: usize) -> Self {
+        RenderNode {
+            mesh_handle: Some(mesh_handle),
+            ..self
+        }
+    }
+
+    pub fn with_material(self, material_handle: usize) -> Self {
+        RenderNode {
+            material_handle: Some(material_handle),
+            ..self
         }
     }
 

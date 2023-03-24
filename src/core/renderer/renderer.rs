@@ -1,6 +1,12 @@
 use glfw::{Glfw, Window};
 
-use super::{backend::gl::object::GLObject, RenderWorld};
+use crate::core::components::transform::Transform;
+
+use super::{
+    backend::gl::object::GLObject,
+    components::{material::MaterialTrait, mesh::Mesh},
+    RenderWorld,
+};
 
 pub struct Renderer {}
 
