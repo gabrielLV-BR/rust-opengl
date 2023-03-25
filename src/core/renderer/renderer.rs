@@ -1,12 +1,6 @@
 use glfw::{Glfw, Window};
 
-use crate::core::components::transform::Transform;
-
-use super::{
-    backend::gl::object::GLObject,
-    components::{material::MaterialTrait, mesh::Mesh},
-    RenderWorld,
-};
+use super::{backend::gl::object::GLObject, RenderWorld};
 
 pub struct Renderer {}
 
@@ -34,10 +28,15 @@ impl Renderer {
                 mesh.bind();
 
                 if let Some(material_handle) = node.material_handle() {
-                    render_world
+                    let material = render_world
                         .get_material(material_handle)
-                        .expect("Invalid material handle")
-                        .bind();
+                        .expect("Invalid material handle");
+
+                    let program = render_world
+                        .get_shader(material.as_ref())
+                        .expect("No shader provided for material");
+
+                    material.bind(program);
                 }
 
                 //TODO maybe abstract this even more? Definitely for later

@@ -1,10 +1,17 @@
 use crate::core::components::transform::Transform;
 
-use super::components::{material::MaterialTrait, mesh::Mesh};
+use super::{
+    backend::gl::shader::{self, Program, Shader},
+    components::{
+        material::{MaterialTrait, MaterialType},
+        mesh::Mesh,
+    },
+};
 
 pub struct RenderWorld {
     meshes: Vec<Mesh>,
     materials: Vec<Box<dyn MaterialTrait>>,
+    programs: Vec<Program>,
     children: Vec<RenderNode>,
 }
 
@@ -13,8 +20,34 @@ impl RenderWorld {
         RenderWorld {
             meshes: vec![],
             materials: vec![],
+            programs: vec![],
             children: vec![],
         }
+    }
+
+    fn load_programs(shader_names: Vec<String>) -> Vec<Program> {
+        shader_names
+            .iter()
+            .map(|shader_name| {
+                let fragment_shader = Shader::from_file(
+                    format!("shaders/{}.frag", shader_name).as_str(),
+                    shader::ShaderType::Fragment,
+                )
+                .expect("Error loading frag shader");
+
+                let vertex_shader = Shader::from_file(
+                    format!("shaders/{}.vert", shader_name).as_str(),
+                    shader::ShaderType::Vertex,
+                )
+                .expect("Error loading vert shader");
+
+                Program::new(vertex_shader, fragment_shader)
+            })
+            .collect()
+    }
+
+    pub fn provide_program_for_material(&mut self, material_type: MaterialType, program: Program) {
+        self.programs.insert(material_type.index(), program);
     }
 
     pub fn nodes(&self) -> &Vec<RenderNode> {
@@ -24,10 +57,15 @@ impl RenderWorld {
     pub fn add_node_with(
         &mut self,
         mesh: Mesh,
-        basic_material: Box<dyn MaterialTrait>,
+        material: Box<dyn MaterialTrait>,
         transform: Transform,
-    ) {
-        todo!()
+    ) -> usize {
+        let node = RenderNode {
+            mesh_handle: Some(self.add_mesh(mesh)),
+            material_handle: Some(self.add_material(material)),
+            transform,
+        };
+        self.add_node(node)
     }
 
     pub fn add_mesh(&mut self, mesh: Mesh) -> usize {
@@ -36,6 +74,7 @@ impl RenderWorld {
     }
 
     pub fn add_material(&mut self, material: Box<dyn MaterialTrait>) -> usize {
+        assert!(self.is_shader_loaded_for_material(material.as_ref()));
         self.materials.push(material);
         self.materials.len() - 1
     }
@@ -51,6 +90,30 @@ impl RenderWorld {
 
     pub fn get_mesh(&self, handle: usize) -> Option<&Mesh> {
         self.meshes.get(handle)
+    }
+
+    pub fn get_shader(&self, material: &dyn MaterialTrait) -> Option<&Program> {
+        self.programs.get(material.material_type().index())
+    }
+
+    //
+
+    fn is_shader_loaded_for_material(&self, material: &dyn MaterialTrait) -> bool {
+        let index = material.material_type().index();
+        (0..self.programs.len()).contains(&index)
+    }
+}
+
+impl Default for RenderWorld {
+    fn default() -> Self {
+        let available_shaders: Vec<String> = vec!["basic".into()];
+
+        RenderWorld {
+            meshes: vec![],
+            materials: vec![],
+            programs: Self::load_programs(available_shaders),
+            children: vec![],
+        }
     }
 }
 

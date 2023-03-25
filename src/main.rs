@@ -1,5 +1,4 @@
 mod core;
-mod servers;
 
 use glfw::{self, Context};
 use std::time::Duration;
@@ -10,7 +9,7 @@ use crate::core::{
     renderer::{
         backend::gl::{vao::VertexAttribute, vertex::Vertex},
         components::{material::BasicMaterial, mesh::Mesh},
-        RenderNode, RenderWorld,
+        RenderWorld,
     },
 };
 
@@ -41,12 +40,10 @@ fn main() {
     glfw.make_context_current(Some(&window));
     // glfw.set_swap_interval(glfw::SwapInterval::Sync(1));
 
-    glfw.make_context_current(Some(&window));
-
     gl::load_with(|s| glfw.get_proc_address_raw(s));
 
-    let mut renderer = core::renderer::Renderer::new(&mut glfw, &window);
-    let mut render_world = RenderWorld::new();
+    let renderer = core::renderer::Renderer::new(&mut glfw, &window);
+    let mut render_world = RenderWorld::default();
 
     let vertices = vec![
         Vertex::position(-0.5, -0.5, 0.0),
@@ -59,6 +56,8 @@ fn main() {
     let basic_material = BasicMaterial::new(Vec3::new(1.0, 0.0, 0.0));
 
     render_world.add_node_with(mesh, Box::new(basic_material), Transform::identity());
+
+    println!("{:?}", render_world.nodes());
 
     let mut delta: f32;
     let mut time: f32;
