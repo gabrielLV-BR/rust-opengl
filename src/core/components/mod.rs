@@ -1,7 +1,7 @@
 use std::hash::Hash;
 
-pub mod transform;
 pub mod camera;
+pub mod transform;
 
 #[derive(PartialEq, Debug)]
 pub struct Color {
