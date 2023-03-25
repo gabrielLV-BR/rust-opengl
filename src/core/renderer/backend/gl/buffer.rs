@@ -6,7 +6,7 @@ use std::mem::size_of;
 pub struct Buffer<T> {
     pub handle: u32,
     target: u32,
-    pub data: Vec<T>
+    pub data: Vec<T>,
 }
 
 pub type VertexBuffer = Buffer<Vertex>;
@@ -24,7 +24,7 @@ impl<T> Buffer<T> {
         Buffer {
             handle,
             target,
-            data: Vec::new()
+            data: Vec::new(),
         }
     }
 
@@ -55,7 +55,7 @@ impl<T> Buffer<T> {
                 self.target,
                 self.size() as isize,
                 self.data.as_ptr().cast(),
-                usage
+                usage,
             );
         }
 
@@ -63,7 +63,7 @@ impl<T> Buffer<T> {
         self
     }
 }
- 
+
 impl<T> Drop for Buffer<T> {
     fn drop(&mut self) {
         unsafe {
@@ -71,21 +71,21 @@ impl<T> Drop for Buffer<T> {
         }
     }
 }
- 
+
 impl<T> GLObject for Buffer<T> {
     fn handle(&self) -> u32 {
-        self.handle    
+        self.handle
     }
 
     fn bind(&self) {
         unsafe {
             gl::BindBuffer(self.target, self.handle);
-        }    
+        }
     }
 
     fn unbind(&self) {
         unsafe {
             gl::BindBuffer(self.target, 0);
-        }    
+        }
     }
 }

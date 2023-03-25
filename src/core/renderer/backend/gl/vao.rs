@@ -2,18 +2,17 @@ use super::object::GLObject;
 use gl::types::*;
 use std::mem::size_of;
 
-
 #[derive(Clone, Copy)]
 pub struct VertexAttribute {
     count: i32,
-    pub order: i32
+    pub order: i32,
 }
 
 impl VertexAttribute {
-    pub const POSITION  : Self = VertexAttribute { count: 3, order: 0 };
-    pub const NORMAL    : Self = VertexAttribute { count: 3, order: 1 };
-    pub const COLOR     : Self = VertexAttribute { count: 3, order: 2 };
-    pub const UV        : Self = VertexAttribute { count: 2, order: 3 };
+    pub const POSITION: Self = VertexAttribute { count: 3, order: 0 };
+    pub const NORMAL: Self = VertexAttribute { count: 3, order: 1 };
+    pub const COLOR: Self = VertexAttribute { count: 3, order: 2 };
+    pub const UV: Self = VertexAttribute { count: 2, order: 3 };
 }
 
 #[derive(Debug)]
@@ -29,9 +28,7 @@ impl VertexArray {
             gl::GenVertexArrays(1, &mut handle);
         }
 
-        VertexArray { 
-            handle
-        }
+        VertexArray { handle }
     }
 
     pub fn bound(self) -> Self {
@@ -63,11 +60,11 @@ impl VertexArray {
             for (index, attribute) in attribs.iter().enumerate() {
                 gl::VertexAttribPointer(
                     index as u32,
-                    attribute.count, 
-                    gl::FLOAT, 
-                    gl::FALSE, 
-                    stride, 
-                    offset as *const GLvoid
+                    attribute.count,
+                    gl::FLOAT,
+                    gl::FALSE,
+                    stride,
+                    offset as *const GLvoid,
                 );
                 gl::EnableVertexAttribArray(index as u32);
 

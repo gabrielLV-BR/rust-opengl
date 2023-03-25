@@ -1,8 +1,8 @@
 pub mod gl {
+    pub mod buffer;
     pub mod object;
     pub mod shader;
-    pub mod vao;
     pub mod texture;
-    pub mod buffer;
+    pub mod vao;
     pub mod vertex;
 }
