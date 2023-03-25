@@ -90,6 +90,9 @@ pub enum UniformType<'a> {
 }
 
 impl Program {
+    // Shader uniform contants
+    pub const COLOR_UNIFORM: &str = "uColor";
+
     pub fn new(vertex_shader: Shader, fragment_shader: Shader) -> Self {
         let handle = unsafe {
             let handle = gl::CreateProgram();
