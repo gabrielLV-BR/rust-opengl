@@ -1,4 +1,4 @@
-use crate::core::renderer::backend::gl::{
+use crate::core::renderer::backend::{
     buffer::{ElementBuffer, VertexBuffer},
     object::GLObject,
     vao::{VertexArray, VertexAttribute},
@@ -24,8 +24,7 @@ impl Mesh {
 
         let vertex_array = VertexArray::new()
             .bound_with(vec![&vertex_buffer, &element_buffer])
-            .with_vertex_attributes(vertex_attributes)
-            .unbound();
+            .with_vertex_attributes(vertex_attributes);
 
         Mesh {
             vertex_array,
@@ -34,7 +33,7 @@ impl Mesh {
         }
     }
 
-    pub fn _vertices(&self) -> &VertexBuffer {
+    pub fn vertices(&self) -> &VertexBuffer {
         &self.vertex_buffer
     }
 

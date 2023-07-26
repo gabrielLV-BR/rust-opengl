@@ -1,2 +1,6 @@
 target/
 .vscode/
+
+
+# For now, I won't save models I'm using for testing
+assets/models/

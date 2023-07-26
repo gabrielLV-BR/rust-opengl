@@ -1,6 +1,6 @@
 use glfw::{Glfw, Window};
 
-use super::{backend::gl::object::GLObject, RenderWorld};
+use super::{backend::object::GLObject, RenderWorld};
 
 pub struct Renderer {}
 
@@ -20,35 +20,36 @@ impl Renderer {
 
     pub fn render(&self, render_world: &RenderWorld) {
         for node in render_world.nodes() {
-            if let Some(mesh_handle) = node.mesh_handle() {
+            if let Some(mesh_handle) = node.get_mesh_handle() {
+                let material_handle = node.get_material_handle().unwrap();
+
                 let mesh = render_world
                     .get_mesh(mesh_handle)
                     .expect("Invalid mesh handle");
 
+                let material = render_world
+                    .get_material(material_handle)
+                    .expect("Invalid material handle");
+
+                let program = render_world
+                    .get_shader(material.as_ref())
+                    .expect("No shader provided for material");
+
                 mesh.bind();
-
-                if let Some(material_handle) = node.material_handle() {
-                    let material = render_world
-                        .get_material(material_handle)
-                        .expect("Invalid material handle");
-
-                    let program = render_world
-                        .get_shader(material.as_ref())
-                        .expect("No shader provided for material");
-
-                    material.bind(program);
-                }
-
-                //TODO maybe abstract this even more? Definitely for later
+                material.bind(program);
 
                 unsafe {
-                    gl::DrawElements(
-                        gl::TRIANGLES,
-                        mesh.elements().count() as i32,
-                        gl::UNSIGNED_INT,
-                        0 as *const std::os::raw::c_void,
-                    )
+                    gl::DrawArrays(gl::TRIANGLES, 0, 3);
                 }
+
+                // unsafe {
+                //     gl::DrawElements(
+                //         gl::TRIANGLES,
+                //         mesh.elements().count() as i32,
+                //         gl::UNSIGNED_INT,
+                //         0 as *const std::os::raw::c_void,
+                //     )
+                // }
             }
         }
     }

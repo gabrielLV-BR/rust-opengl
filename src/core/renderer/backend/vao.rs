@@ -31,21 +31,12 @@ impl VertexArray {
         VertexArray { handle }
     }
 
-    pub fn bound(self) -> Self {
-        self.bind();
-        self
-    }
-
-    pub fn unbound(self) -> Self {
-        self.unbind();
-        self
-    }
-
     pub fn bound_with(self, objects: Vec<&dyn GLObject>) -> Self {
         self.bind();
         for obj in objects.iter() {
             obj.bind();
         }
+        self.unbind();
         self
     }
 

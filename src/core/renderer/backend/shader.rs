@@ -1,5 +1,5 @@
 use gl::{self, types::GLchar};
-use std::{collections::HashMap, io};
+use std::{collections::HashMap, io, path::PathBuf};
 
 use super::object::GLObject;
 
@@ -31,7 +31,7 @@ impl Shader {
         Shader { handle }
     }
 
-    pub fn from_file(path: &str, shader_type: ShaderType) -> Result<Shader, io::Error> {
+    pub fn from_file(path: &PathBuf, shader_type: ShaderType) -> Result<Shader, io::Error> {
         let source = std::fs::read_to_string(path)?;
         Ok(Shader::new(&source, shader_type))
     }
@@ -92,6 +92,7 @@ pub enum UniformType<'a> {
 impl Program {
     // Shader uniform contants
     pub const COLOR_UNIFORM: &str = "uColor";
+    pub const TEXTURE_MAP_UNIFORM: &str = "uTexturemap";
 
     pub fn new(vertex_shader: Shader, fragment_shader: Shader) -> Self {
         let handle = unsafe {

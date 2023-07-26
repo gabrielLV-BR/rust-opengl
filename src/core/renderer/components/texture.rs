@@ -1,8 +1,6 @@
 use gl::{self, types::*};
 use image;
 
-use super::object::GLObject;
-
 #[derive(Debug)]
 pub struct Texture {
     handle: u32,
@@ -56,23 +54,5 @@ impl Texture {
     pub fn load_from(path: &str) -> Result<Texture, image::ImageError> {
         let image = image::open(path)?;
         Ok(Self::new(image))
-    }
-}
-
-impl GLObject for Texture {
-    fn handle(&self) -> u32 {
-        self.handle
-    }
-
-    fn bind(&self) {
-        unsafe {
-            gl::BindTexture(gl::TEXTURE_2D, self.handle);
-        }
-    }
-
-    fn unbind(&self) {
-        unsafe {
-            gl::BindTexture(gl::TEXTURE_2D, 0);
-        }
     }
 }

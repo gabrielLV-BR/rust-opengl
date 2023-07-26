@@ -1,14 +1,20 @@
 mod core;
 
+use gl::{PROGRAM_BINARY_FORMATS, STATIC_DRAW};
 use glfw::{self, Context};
-use std::time::Duration;
+use std::{ffi::c_void, path::PathBuf, time::Duration};
 use ultraviolet::Vec3;
 
 use crate::core::{
     components::transform::Transform,
     renderer::{
-        backend::gl::{vao::VertexAttribute, vertex::Vertex},
-        components::{material::BasicMaterial, mesh::Mesh},
+        backend::{
+            object::GLObject,
+            shader::{Program, Shader, ShaderType, UniformType},
+            vao::VertexAttribute,
+            vertex::Vertex,
+        },
+        components::{material::ColoredMaterial, mesh::Mesh},
         RenderWorld,
     },
 };
@@ -37,11 +43,6 @@ fn main() {
         )
         .unwrap();
 
-    glfw.make_context_current(Some(&window));
-    // glfw.set_swap_interval(glfw::SwapInterval::Sync(1));
-
-    gl::load_with(|s| glfw.get_proc_address_raw(s));
-
     let renderer = core::renderer::Renderer::new(&mut glfw, &window);
     let mut render_world = RenderWorld::default();
 
@@ -51,9 +52,8 @@ fn main() {
         Vertex::position(0.5, -0.5, 0.0),
     ];
     let indices = vec![0u32, 1, 2];
-
     let mesh = Mesh::new(vertices, indices, vec![VertexAttribute::POSITION]);
-    let basic_material = BasicMaterial::new(Vec3::new(1.0, 0.0, 0.0));
+    let basic_material = ColoredMaterial::new(Vec3::new(1.0, 0.0, 0.0));
 
     render_world.add_node_with(mesh, Box::new(basic_material), Transform::identity());
 

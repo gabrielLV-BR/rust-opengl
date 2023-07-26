@@ -1,7 +1,9 @@
+use std::path::{Path, PathBuf};
+
 use crate::core::components::transform::Transform;
 
 use super::{
-    backend::gl::shader::{self, Program, Shader},
+    backend::shader::{self, Program, Shader},
     components::{
         material::{MaterialTrait, MaterialType},
         mesh::Mesh,
@@ -12,11 +14,11 @@ pub struct RenderWorld {
     meshes: Vec<Mesh>,
     materials: Vec<Box<dyn MaterialTrait>>,
     programs: Vec<Program>,
-    children: Vec<RenderNode>,
+    children: Vec<Node>,
 }
 
 impl RenderWorld {
-    pub fn new() -> Self {
+    pub(crate) fn new() -> Self {
         RenderWorld {
             meshes: vec![],
             materials: vec![],
@@ -25,32 +27,11 @@ impl RenderWorld {
         }
     }
 
-    fn load_programs(shader_names: Vec<String>) -> Vec<Program> {
-        shader_names
-            .iter()
-            .map(|shader_name| {
-                let fragment_shader = Shader::from_file(
-                    format!("shaders/{}.frag", shader_name).as_str(),
-                    shader::ShaderType::Fragment,
-                )
-                .expect("Error loading frag shader");
-
-                let vertex_shader = Shader::from_file(
-                    format!("shaders/{}.vert", shader_name).as_str(),
-                    shader::ShaderType::Vertex,
-                )
-                .expect("Error loading vert shader");
-
-                Program::new(vertex_shader, fragment_shader)
-            })
-            .collect()
-    }
-
     pub fn provide_program_for_material(&mut self, material_type: MaterialType, program: Program) {
         self.programs.insert(material_type.index(), program);
     }
 
-    pub fn nodes(&self) -> &Vec<RenderNode> {
+    pub fn nodes(&self) -> &Vec<Node> {
         &self.children
     }
 
@@ -60,7 +41,7 @@ impl RenderWorld {
         material: Box<dyn MaterialTrait>,
         transform: Transform,
     ) -> usize {
-        let node = RenderNode {
+        let node = Node {
             mesh_handle: Some(self.add_mesh(mesh)),
             material_handle: Some(self.add_material(material)),
             transform,
@@ -79,7 +60,7 @@ impl RenderWorld {
         self.materials.len() - 1
     }
 
-    pub fn add_node(&mut self, node: RenderNode) -> usize {
+    pub fn add_node(&mut self, node: Node) -> usize {
         self.children.push(node);
         self.children.len() - 1
     }
@@ -104,30 +85,49 @@ impl RenderWorld {
     }
 }
 
+fn load_program_with_name(name: &str) -> Program {
+    let fragment_shader_path =
+        Path::canonicalize(&PathBuf::from(format!("assets/shaders/{}.frag.glsl", name)))
+            .expect("Shader does not exist");
+
+    let vertex_shader_path =
+        Path::canonicalize(&PathBuf::from(format!("assets/shaders/{}.vert.glsl", name)))
+            .expect("Shader does not exist");
+
+    let fragment_shader = Shader::from_file(&fragment_shader_path, shader::ShaderType::Fragment)
+        .expect("Error loading frag shader");
+
+    let vertex_shader = Shader::from_file(&vertex_shader_path, shader::ShaderType::Vertex)
+        .expect("Error loading vert shader");
+
+    Program::new(vertex_shader, fragment_shader)
+}
+
 impl Default for RenderWorld {
     fn default() -> Self {
-        let available_shaders: Vec<String> = vec!["basic".into()];
+        let colored_program = load_program_with_name("colored");
+        let textured_program = load_program_with_name("textured");
 
-        RenderWorld {
-            meshes: vec![],
-            materials: vec![],
-            programs: Self::load_programs(available_shaders),
-            children: vec![],
-        }
+        let mut render_world = RenderWorld::new();
+
+        render_world.provide_program_for_material(MaterialType::ColoredMaterial, colored_program);
+        render_world.provide_program_for_material(MaterialType::TexturedMaterial, textured_program);
+
+        return render_world;
     }
 }
 
 #[derive(Debug)]
-pub struct RenderNode {
+pub struct Node {
     mesh_handle: Option<usize>,
     material_handle: Option<usize>,
     transform: Transform,
     // children: Option<Vec<usize>>
 }
 
-impl RenderNode {
+impl Node {
     pub fn new() -> Self {
-        RenderNode {
+        Node {
             mesh_handle: None,
             material_handle: None,
             transform: Transform::identity(),
@@ -135,35 +135,35 @@ impl RenderNode {
     }
 
     pub fn with_mesh(self, mesh_handle: usize) -> Self {
-        RenderNode {
+        Node {
             mesh_handle: Some(mesh_handle),
             ..self
         }
     }
 
     pub fn with_material(self, material_handle: usize) -> Self {
-        RenderNode {
+        Node {
             material_handle: Some(material_handle),
             ..self
         }
     }
 
-    pub fn mesh_handle(&self) -> Option<usize> {
+    pub fn get_mesh_handle(&self) -> Option<usize> {
         self.mesh_handle
     }
 
-    pub fn material_handle(&self) -> Option<usize> {
+    pub fn get_material_handle(&self) -> Option<usize> {
         self.material_handle
     }
 
-    pub fn transform(&self) -> &Transform {
+    pub fn get_transform(&self) -> &Transform {
         &self.transform
     }
 }
 
-impl Default for RenderNode {
+impl Default for Node {
     fn default() -> Self {
-        RenderNode {
+        Node {
             mesh_handle: None,
             material_handle: None,
             transform: Transform::identity(),

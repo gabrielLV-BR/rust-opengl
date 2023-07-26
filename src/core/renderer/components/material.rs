@@ -1,9 +1,12 @@
 use ultraviolet::Vec3;
 
-use crate::core::renderer::backend::gl::shader::{Program, UniformType};
+use super::texture::Texture;
+use crate::core::renderer::backend::shader::{Program, UniformType};
 
+#[derive(Debug)]
 pub enum MaterialType {
-    BasicMaterial = 0,
+    ColoredMaterial = 0,
+    TexturedMaterial = 1,
 }
 
 impl MaterialType {
@@ -19,23 +22,47 @@ pub trait MaterialTrait {
 
 // Material with only a simple color
 
-pub struct BasicMaterial {
+pub struct ColoredMaterial {
     pub color: Vec3,
 }
 
-impl BasicMaterial {
+impl ColoredMaterial {
     pub fn new(color: Vec3) -> Self {
-        BasicMaterial { color }
+        ColoredMaterial { color }
     }
 }
 
-impl MaterialTrait for BasicMaterial {
+impl MaterialTrait for ColoredMaterial {
     fn bind(&self, program: &Program) {
         // Program must already be bound
         program.set_uniform(Program::COLOR_UNIFORM, UniformType::Vec3(&self.color));
     }
 
     fn material_type(&self) -> MaterialType {
-        MaterialType::BasicMaterial
+        MaterialType::ColoredMaterial
+    }
+}
+
+// Material with a diffuse texture
+
+pub struct TexturedMaterial {
+    pub color: Vec3,
+    pub texture: Texture,
+}
+
+impl TexturedMaterial {
+    pub fn new(color: Vec3, texture: Texture) -> Self {
+        TexturedMaterial { color, texture }
+    }
+}
+
+impl MaterialTrait for TexturedMaterial {
+    fn bind(&self, program: &Program) {
+        // Program must already be bound
+        program.set_uniform(Program::COLOR_UNIFORM, UniformType::Vec3(&self.color));
+    }
+
+    fn material_type(&self) -> MaterialType {
+        MaterialType::TexturedMaterial
     }
 }
